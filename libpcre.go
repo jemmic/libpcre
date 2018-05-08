@@ -32948,13 +32948,6 @@ func pcre_free_substring(pointer *byte) {
 	pcre_free(unsafe.Pointer(pointer))
 }
 
-var pcre_malloc func(size_t) unsafe.Pointer
-var pcre_free func(unsafe.Pointer)
-var pcre_stack_malloc func(size_t) unsafe.Pointer
-var pcre_stack_free func(unsafe.Pointer)
-var pcre_callout func(*pcre_callout_block) int32
-var pcre_stack_guard func() int32
-
 // pcre_maketables - transpiled function from  /root/Documents/pcre/pcre_maketables.c:70
 /*************************************************
 *      Perl-Compatible Regular Expressions       *
