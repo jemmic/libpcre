@@ -8093,6 +8093,7 @@ func compile_branch(optionsptr *int32, codeptr **pcre_uchar, ptrptr **pcre_uchar
 		const HANDLE_RECURSION = 1
 		const HANDLE_NUMERICAL_RECURSION = 2
 		var goto_HANDLE_REFERENCE bool
+		var goto_NAMED_REF_OR_RECURSE bool
 	REDO_LOOP:
 		;
 		c = pcre_uint32((uint32(uint8((*ptr)))))
@@ -10099,6 +10100,8 @@ func compile_branch(optionsptr *int32, codeptr **pcre_uchar, ptrptr **pcre_uchar
 			(*cd).req_varyopt |= int32((reqvary))
 			goto SW_GENERATED_LABEL_127
 		}
+	NAMED_REF_OR_RECURSE_CONTAINER_OUTER:
+		;
 	HANDLE_RECURSION_CONTAINER_OUTER:
 		;
 	SW_GENERATED_LABEL_140:
@@ -10106,6 +10109,9 @@ func compile_branch(optionsptr *int32, codeptr **pcre_uchar, ptrptr **pcre_uchar
 			var goto_NUMBERED_GROUP bool
 			if goto_HANDLE != 0 {
 				goto HANDLE_RECURSION_CONTAINER_MIDDLE
+			}
+			if goto_NAMED_REF_OR_RECURSE {
+				goto NAMED_REF_OR_RECURSE_CONTAINER
 			}
 			ptr = ((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ptr)) + (uintptr)(1)*unsafe.Sizeof(*ptr))))
 			if (int32(uint8((*ptr))) == int32('*')) && ((int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ptr)) + (uintptr)(int32(1))*unsafe.Sizeof(*ptr))))))) == int32(':')) || ((int32(1) != 0) && ((int32(uint8((*((*pcre_uint8)(func() unsafe.Pointer {
@@ -10299,9 +10305,10 @@ func compile_branch(optionsptr *int32, codeptr **pcre_uchar, ptrptr **pcre_uchar
 			bravalue = OP_CBRA
 			item_hwm_offset = size_t((uint32((int64(uintptr(unsafe.Pointer((*cd).hwm))) - int64(uintptr(unsafe.Pointer((*cd).start_workspace)))))))
 			reset_bracount = BOOL((int32(0)))
+		NAMED_REF_OR_RECURSE_CONTAINER:
 		HANDLE_RECURSION_CONTAINER_MIDDLE:
 		NUMBERED_GROUP_CONTAINER:
-			if !goto_NUMBERED_GROUP && (goto_HANDLE != 0 || int32(uint8((*ptr))) == int32('?')) {
+			if !goto_NUMBERED_GROUP && (goto_HANDLE != 0 || goto_NAMED_REF_OR_RECURSE || int32(uint8((*ptr))) == int32('?')) {
 				var i int32
 				var set int32
 				var unset int32
@@ -10311,6 +10318,10 @@ func compile_branch(optionsptr *int32, codeptr **pcre_uchar, ptrptr **pcre_uchar
 				var slot *pcre_uchar
 				if goto_HANDLE != 0 {
 					goto HANDLE_RECURSION_CONTAINER
+				}
+				if goto_NAMED_REF_OR_RECURSE {
+					goto_NAMED_REF_OR_RECURSE = false
+					goto NAMED_REF_OR_RECURSE
 				}
 				switch int32(uint8((pcre_uchar(*func() *pcre_uchar {
 					ptr = ((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ptr)) + (uintptr)(1)*unsafe.Sizeof(*ptr))))
@@ -11405,7 +11416,8 @@ func compile_branch(optionsptr *int32, codeptr **pcre_uchar, ptrptr **pcre_uchar
 					cf = pcre_uint32((uint32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ptr)) + (uintptr)(int32(1))*unsafe.Sizeof(*ptr)))))))))
 					if ((cf != pcre_uint32((uint32('+')))) && (cf != pcre_uint32((uint32('-'))))) && (noarch.NotInt32((map[bool]int32{false: 0, true: 1}[((cf >= pcre_uint32((uint32('0')))) && (cf <= pcre_uint32((uint32('9')))))])) != 0) {
 						is_recurse = BOOL((int32(1)))
-						goto NAMED_REF_OR_RECURSE
+						goto_NAMED_REF_OR_RECURSE = true
+						goto NAMED_REF_OR_RECURSE_CONTAINER_OUTER
 					}
 					p = ((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ptr)) + (uintptr)(int32(2))*unsafe.Sizeof(*ptr))))
 					for (int32(uint8((*p))) >= int32('0')) && (int32(uint8((*p))) <= int32('9')) {
@@ -11441,7 +11453,8 @@ func compile_branch(optionsptr *int32, codeptr **pcre_uchar, ptrptr **pcre_uchar
 							}()
 						}
 					}()
-					goto NAMED_REF_OR_RECURSE
+					goto_NAMED_REF_OR_RECURSE = true
+					goto NAMED_REF_OR_RECURSE_CONTAINER_OUTER
 				}
 			HANDLE_REFERENCE_CONTAINER:
 				if goto_HANDLE_REFERENCE || escape < int32(0) {
