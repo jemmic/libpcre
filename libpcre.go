@@ -9199,6 +9199,7 @@ func compile_branch(optionsptr *int32, codeptr **pcre_uchar, ptrptr **pcre_uchar
 		}
 	REPEAT:
 		{
+			var goto_OUTPUT_SINGLE_REPEAT bool
 			if previous == nil {
 				*errorcodeptr = ERR9
 				goto FAILED
@@ -9339,7 +9340,8 @@ func compile_branch(optionsptr *int32, codeptr **pcre_uchar, ptrptr **pcre_uchar
 					}
 				}
 			}
-			if (((int32(uint8((*previous))) == OP_CHAR) || (int32(uint8((*previous))) == OP_CHARI)) || (int32(uint8((*previous))) == OP_NOT)) || (int32(uint8((*previous))) == OP_NOTI) {
+		OUTPUT_SINGLE_REPEAT_CONTAINER:
+			if !goto_OUTPUT_SINGLE_REPEAT && ((((int32(uint8((*previous))) == OP_CHAR) || (int32(uint8((*previous))) == OP_CHARI)) || (int32(uint8((*previous))) == OP_NOT)) || (int32(uint8((*previous))) == OP_NOTI)) {
 				switch int32(uint8((pcre_uchar(*previous)))) {
 				default:
 					fallthrough
@@ -9376,11 +9378,16 @@ func compile_branch(optionsptr *int32, codeptr **pcre_uchar, ptrptr **pcre_uchar
 						reqcharflags = (req_caseopt | pcre_int32(((*cd).req_varyopt)))
 					}
 				}
-				goto OUTPUT_SINGLE_REPEAT
-			} else if int32(uint8((*previous))) < OP_EODN {
+				goto_OUTPUT_SINGLE_REPEAT = true
+				goto OUTPUT_SINGLE_REPEAT_CONTAINER
+			} else if goto_OUTPUT_SINGLE_REPEAT || int32(uint8((*previous))) < OP_EODN {
 				var oldcode *pcre_uchar
 				var prop_type int32
 				var prop_value int32
+				if goto_OUTPUT_SINGLE_REPEAT {
+					goto_OUTPUT_SINGLE_REPEAT = false
+					goto OUTPUT_SINGLE_REPEAT
+				}
 				op_type = (OP_TYPESTAR - OP_STAR)
 				c = pcre_uint32((uint32(uint8((*previous)))))
 			OUTPUT_SINGLE_REPEAT:
@@ -10090,6 +10097,7 @@ func compile_branch(optionsptr *int32, codeptr **pcre_uchar, ptrptr **pcre_uchar
 		}
 	SW_GENERATED_LABEL_140:
 		{
+			var goto_NUMBERED_GROUP bool
 			ptr = ((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ptr)) + (uintptr)(1)*unsafe.Sizeof(*ptr))))
 			if (int32(uint8((*ptr))) == int32('*')) && ((int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ptr)) + (uintptr)(int32(1))*unsafe.Sizeof(*ptr))))))) == int32(':')) || ((int32(1) != 0) && ((int32(uint8((*((*pcre_uint8)(func() unsafe.Pointer {
 				tempVar := (*cd).ctypes
@@ -10282,7 +10290,8 @@ func compile_branch(optionsptr *int32, codeptr **pcre_uchar, ptrptr **pcre_uchar
 			bravalue = OP_CBRA
 			item_hwm_offset = size_t((uint32((int64(uintptr(unsafe.Pointer((*cd).hwm))) - int64(uintptr(unsafe.Pointer((*cd).start_workspace)))))))
 			reset_bracount = BOOL((int32(0)))
-			if int32(uint8((*ptr))) == int32('?') {
+		NUMBERED_GROUP_CONTAINER:
+			if !goto_NUMBERED_GROUP && int32(uint8((*ptr))) == int32('?') {
 				var i int32
 				var set int32
 				var unset int32
@@ -10788,7 +10797,8 @@ func compile_branch(optionsptr *int32, codeptr **pcre_uchar, ptrptr **pcre_uchar
 						}
 					}
 					ptr = ((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ptr)) + (uintptr)(1)*unsafe.Sizeof(*ptr))))
-					goto NUMBERED_GROUP
+					goto_NUMBERED_GROUP = true
+					goto NUMBERED_GROUP_CONTAINER
 				}
 			SW_GENERATED_LABEL_112:
 				{
@@ -11171,9 +11181,13 @@ func compile_branch(optionsptr *int32, codeptr **pcre_uchar, ptrptr **pcre_uchar
 					ptr = ((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ptr)) + (uintptr)(1)*unsafe.Sizeof(*ptr))))
 				}
 			SW_GENERATED_LABEL_101:
-			} else if (options & int32(4096)) != int32(0) {
+			} else if !goto_NUMBERED_GROUP && (options & int32(4096)) != int32(0) {
 				bravalue = OP_BRA
 			} else {
+				if goto_NUMBERED_GROUP {
+					goto_NUMBERED_GROUP = false
+					goto NUMBERED_GROUP
+				}
 			NUMBERED_GROUP:
 				;
 				(*cd).bracount += uint32(int32(1))
@@ -12638,6 +12652,7 @@ func pcre_compile2(pattern *byte, options int32, errorcodeptr *int32, errorptr *
 	var cd *compile_data = &compile_block
 	var cworkspace []pcre_uchar = make([]pcre_uchar, 4096, 4096)
 	var named_groups []named_group = make([]named_group, 20, 20)
+	var gotoErrorReturn int
 	ptr = (*pcre_uchar)(unsafe.Pointer(pattern))
 	if errorptr == nil {
 		if errorcodeptr != nil {
@@ -12651,7 +12666,8 @@ func pcre_compile2(pattern *byte, options int32, errorcodeptr *int32, errorptr *
 	}
 	if erroroffset == nil {
 		errorcode = ERR16
-		goto PCRE_EARLY_ERROR_RETURN2
+		gotoErrorReturn = 2
+		goto PCRE_EARLY_ERROR_RETURN_CONTAINER
 	}
 	*erroroffset = int32(0)
 	if tables == nil {
@@ -12663,7 +12679,8 @@ func pcre_compile2(pattern *byte, options int32, errorcodeptr *int32, errorptr *
 	(*cd).ctypes = (*pcre_uint8)(unsafe.Pointer(((*uint8)(unsafe.Pointer(uintptr(unsafe.Pointer(tables)) + (uintptr)((int32(512)+int32(320)))*unsafe.Sizeof(*tables))))))
 	if (options & ^(((((((((((((((((((((int32(1) | int32(8)) | int32(16)) | int32(2)) | int32(4)) | int32(32)) | int32(64)) | int32(512)) | int32(2048)) | int32(4096)) | int32(131072)) | int32(8192)) | int32(16384)) | int32(262144)) | int32(524288)) | (((int32(1048576) | int32(2097152)) | int32(4194304)) | int32(5242880))) | int32(8388608)) | int32(16777216)) | int32(33554432)) | int32(536870912)) | int32(67108864)) | int32(65536))) != int32(0) {
 		errorcode = ERR17
-		goto PCRE_EARLY_ERROR_RETURN
+		gotoErrorReturn = 1
+		goto PCRE_EARLY_ERROR_RETURN_CONTAINER
 	}
 	if (options & int32(65536)) != int32(0) {
 		never_utf = BOOL((int32(1)))
@@ -12830,7 +12847,8 @@ func pcre_compile2(pattern *byte, options int32, errorcodeptr *int32, errorptr *
 	utf = BOOL((map[bool]int32{false: 0, true: 1}[((options & int32(2048)) != int32(0))]))
 	if (int32((utf)) != 0) && (int32((never_utf)) != 0) {
 		errorcode = ERR78
-		goto PCRE_EARLY_ERROR_RETURN2
+		gotoErrorReturn = 2
+		goto PCRE_EARLY_ERROR_RETURN_CONTAINER
 	}
 	if ((int32((utf)) != 0) && ((options & int32(8192)) == int32(0))) && ((func() int32 {
 		tempVar := _pcre_valid_utf((*pcre_uchar)(unsafe.Pointer(pattern)), -int32(1), erroroffset)
@@ -12838,11 +12856,13 @@ func pcre_compile2(pattern *byte, options int32, errorcodeptr *int32, errorptr *
 		return tempVar
 	}()) != int32(0)) {
 		errorcode = ERR44
-		goto PCRE_EARLY_ERROR_RETURN2
+		gotoErrorReturn = 2
+		goto PCRE_EARLY_ERROR_RETURN_CONTAINER
 	}
 	if (options & (int32(8388608) | int32(16777216))) == (int32(8388608) | int32(16777216)) {
 		errorcode = ERR56
-		goto PCRE_EARLY_ERROR_RETURN
+		gotoErrorReturn = 1
+		goto PCRE_EARLY_ERROR_RETURN_CONTAINER
 	}
 	switch options & (((int32(1048576) | int32(2097152)) | int32(4194304)) | int32(5242880)) {
 	case int32(0):
@@ -12872,7 +12892,8 @@ func pcre_compile2(pattern *byte, options int32, errorcodeptr *int32, errorptr *
 	default:
 		{
 			errorcode = ERR56
-			goto PCRE_EARLY_ERROR_RETURN
+			gotoErrorReturn = 1
+			goto PCRE_EARLY_ERROR_RETURN_CONTAINER
 		}
 	}
 	if newline == -int32(2) {
@@ -12926,17 +12947,20 @@ func pcre_compile2(pattern *byte, options int32, errorcodeptr *int32, errorptr *
 	*code = pcre_uchar((uint8(OP_BRA)))
 	_ = compile_regex(int32(uint32((pcre_uint32((*cd).external_options)))), &code, &ptr, &errorcode, BOOL((int32(0))), BOOL((int32(0))), int32(0), int32(0), &firstchar, &firstcharflags, &reqchar, &reqcharflags, nil, cd, &length)
 	if errorcode != int32(0) {
-		goto PCRE_EARLY_ERROR_RETURN
+		gotoErrorReturn = 1
+		goto PCRE_EARLY_ERROR_RETURN_CONTAINER
 	}
 	if length > (int32(1) << uint64(int32(16))) {
 		errorcode = ERR20
-		goto PCRE_EARLY_ERROR_RETURN
+		gotoErrorReturn = 1
+		goto PCRE_EARLY_ERROR_RETURN_CONTAINER
 	}
 	size = size_t((64 + (uint32((length + ((*cd).names_found * (*cd).name_entry_size))) * 1)))
 	re = (*real_pcre)(pcre_malloc(size_t(size)))
 	if re == nil {
 		errorcode = ERR21
-		goto PCRE_EARLY_ERROR_RETURN
+		gotoErrorReturn = 1
+		goto PCRE_EARLY_ERROR_RETURN_CONTAINER
 	}
 	(*re).magic_number = pcre_uint32(1346589253)
 	(*re).size = pcre_uint32((uint32(int32(uint32((size_t(size)))))))
@@ -13117,7 +13141,14 @@ func pcre_compile2(pattern *byte, options int32, errorcodeptr *int32, errorptr *
 			cc = ((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(cc)) + (uintptr)((int32(1)+int32(2)))*unsafe.Sizeof(*cc))))
 		}
 	}
-	if errorcode != int32(0) {
+PCRE_EARLY_ERROR_RETURN_CONTAINER:
+	if errorcode != int32(0) || gotoErrorReturn != 0 {
+		switch(gotoErrorReturn) {
+		case 1:
+			goto PCRE_EARLY_ERROR_RETURN
+		case 2:
+			goto PCRE_EARLY_ERROR_RETURN2
+		}
 		pcre_free(unsafe.Pointer(re))
 	PCRE_EARLY_ERROR_RETURN:
 		;
