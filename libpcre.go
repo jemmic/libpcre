@@ -8089,6 +8089,9 @@ func compile_branch(optionsptr *int32, codeptr **pcre_uchar, ptrptr **pcre_uchar
 		var tempbracount uint32
 		var ec pcre_uint32
 		var mcbuffer []pcre_uchar = make([]pcre_uchar, 8, 8)
+		var goto_HANDLE int
+		const HANDLE_RECURSION = 1
+		const HANDLE_NUMERICAL_RECURSION = 2
 	REDO_LOOP:
 		;
 		c = pcre_uint32((uint32(uint8((*ptr)))))
@@ -10095,9 +10098,14 @@ func compile_branch(optionsptr *int32, codeptr **pcre_uchar, ptrptr **pcre_uchar
 			(*cd).req_varyopt |= int32((reqvary))
 			goto SW_GENERATED_LABEL_127
 		}
+	HANDLE_RECURSION_CONTAINER_OUTER:
+		;
 	SW_GENERATED_LABEL_140:
 		{
 			var goto_NUMBERED_GROUP bool
+			if goto_HANDLE != 0 {
+				goto HANDLE_RECURSION_CONTAINER_MIDDLE
+			}
 			ptr = ((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ptr)) + (uintptr)(1)*unsafe.Sizeof(*ptr))))
 			if (int32(uint8((*ptr))) == int32('*')) && ((int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ptr)) + (uintptr)(int32(1))*unsafe.Sizeof(*ptr))))))) == int32(':')) || ((int32(1) != 0) && ((int32(uint8((*((*pcre_uint8)(func() unsafe.Pointer {
 				tempVar := (*cd).ctypes
@@ -10290,8 +10298,9 @@ func compile_branch(optionsptr *int32, codeptr **pcre_uchar, ptrptr **pcre_uchar
 			bravalue = OP_CBRA
 			item_hwm_offset = size_t((uint32((int64(uintptr(unsafe.Pointer((*cd).hwm))) - int64(uintptr(unsafe.Pointer((*cd).start_workspace)))))))
 			reset_bracount = BOOL((int32(0)))
+		HANDLE_RECURSION_CONTAINER_MIDDLE:
 		NUMBERED_GROUP_CONTAINER:
-			if !goto_NUMBERED_GROUP && int32(uint8((*ptr))) == int32('?') {
+			if !goto_NUMBERED_GROUP && (goto_HANDLE != 0 || int32(uint8((*ptr))) == int32('?')) {
 				var i int32
 				var set int32
 				var unset int32
@@ -10299,6 +10308,9 @@ func compile_branch(optionsptr *int32, codeptr **pcre_uchar, ptrptr **pcre_uchar
 				var optset *int32
 				var name *pcre_uchar
 				var slot *pcre_uchar
+				if goto_HANDLE != 0 {
+					goto HANDLE_RECURSION_CONTAINER
+				}
 				switch int32(uint8((pcre_uchar(*func() *pcre_uchar {
 					ptr = ((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ptr)) + (uintptr)(1)*unsafe.Sizeof(*ptr))))
 					return ptr
@@ -10881,7 +10893,8 @@ func compile_branch(optionsptr *int32, codeptr **pcre_uchar, ptrptr **pcre_uchar
 						}
 					}
 					if int32((BOOL(is_recurse))) != 0 {
-						goto HANDLE_RECURSION
+						goto_HANDLE = HANDLE_RECURSION
+						goto HANDLE_RECURSION_CONTAINER
 					}
 					if (lengthptr == nil) && (int32((BOOL((*cd).dupnames))) != 0) {
 						var count int32 = int32(1)
@@ -10953,7 +10966,8 @@ func compile_branch(optionsptr *int32, codeptr **pcre_uchar, ptrptr **pcre_uchar
 						*errorcodeptr = ERR29
 						goto FAILED
 					}
-					goto HANDLE_RECURSION
+					goto_HANDLE = HANDLE_RECURSION
+					goto HANDLE_RECURSION_CONTAINER
 				}
 			SW_GENERATED_LABEL_114:
 				;
@@ -10975,11 +10989,21 @@ func compile_branch(optionsptr *int32, codeptr **pcre_uchar, ptrptr **pcre_uchar
 				;
 			SW_GENERATED_LABEL_123:
 				;
+			HANDLE_RECURSION_CONTAINER:
+				;
 			SW_GENERATED_LABEL_124:
 				;
 			SW_GENERATED_LABEL_125:
 				{
 					var called *pcre_uchar
+					switch goto_HANDLE {
+					case HANDLE_RECURSION:
+						goto_HANDLE = 0
+						goto HANDLE_RECURSION
+					case HANDLE_NUMERICAL_RECURSION:
+						goto_HANDLE = 0
+						goto HANDLE_NUMERICAL_RECURSION
+					}
 					terminator = int32(')')
 				HANDLE_NUMERICAL_RECURSION:
 					;
@@ -11381,7 +11405,8 @@ func compile_branch(optionsptr *int32, codeptr **pcre_uchar, ptrptr **pcre_uchar
 						goto FAILED
 					}
 					ptr = ((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ptr)) + (uintptr)(1)*unsafe.Sizeof(*ptr))))
-					goto HANDLE_NUMERICAL_RECURSION
+					goto_HANDLE = HANDLE_NUMERICAL_RECURSION
+					goto HANDLE_RECURSION_CONTAINER_OUTER
 				}
 				if escape == ESC_k {
 					if (map[bool]int32{false: 0, true: 1}[(((int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ptr)) + (uintptr)(int32(1))*unsafe.Sizeof(*ptr))))))) != int32('<')) && (int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ptr)) + (uintptr)(int32(1))*unsafe.Sizeof(*ptr))))))) != int32('\''))) && (int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ptr)) + (uintptr)(int32(1))*unsafe.Sizeof(*ptr))))))) != int32('{')))]) != 0 {
