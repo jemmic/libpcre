@@ -8092,6 +8092,7 @@ func compile_branch(optionsptr *int32, codeptr **pcre_uchar, ptrptr **pcre_uchar
 		var goto_HANDLE int
 		const HANDLE_RECURSION = 1
 		const HANDLE_NUMERICAL_RECURSION = 2
+		var goto_HANDLE_REFERENCE bool
 	REDO_LOOP:
 		;
 		c = pcre_uint32((uint32(uint8((*ptr)))))
@@ -10954,7 +10955,8 @@ func compile_branch(optionsptr *int32, codeptr **pcre_uchar, ptrptr **pcre_uchar
 							continue
 						}
 					}
-					goto HANDLE_REFERENCE
+					goto_HANDLE_REFERENCE = true
+					goto HANDLE_REFERENCE_CONTAINER_OUTER
 				}
 			SW_GENERATED_LABEL_113:
 				{
@@ -11358,16 +11360,25 @@ func compile_branch(optionsptr *int32, codeptr **pcre_uchar, ptrptr **pcre_uchar
 			}
 		}
 		goto SW_GENERATED_LABEL_127
+	HANDLE_REFERENCE_CONTAINER_OUTER:
+		;
 	SW_GENERATED_LABEL_141:
 		{
+			if goto_HANDLE_REFERENCE {
+				goto HANDLE_REFERENCE_CONTAINER_INNER
+			}
 			tempptr = ptr
 			escape = check_escape(&ptr, &ec, errorcodeptr, int32((*cd).bracount), options, BOOL((int32(0))))
 			if *errorcodeptr != int32(0) {
 				goto FAILED
 			}
-			if escape == int32(0) {
+		HANDLE_REFERENCE_CONTAINER_INNER:
+			if !goto_HANDLE_REFERENCE && escape == int32(0) {
 				c = ec
 			} else {
+				if goto_HANDLE_REFERENCE {
+					goto HANDLE_REFERENCE_CONTAINER
+				}
 				if ((firstcharflags == pcre_int32((-int32(2)))) && (escape > ESC_b)) && (escape < ESC_Z) {
 					firstcharflags = pcre_int32((-int32(1)))
 				}
@@ -11432,8 +11443,13 @@ func compile_branch(optionsptr *int32, codeptr **pcre_uchar, ptrptr **pcre_uchar
 					}()
 					goto NAMED_REF_OR_RECURSE
 				}
-				if escape < int32(0) {
+			HANDLE_REFERENCE_CONTAINER:
+				if goto_HANDLE_REFERENCE || escape < int32(0) {
 					var oc *open_capitem
+					if goto_HANDLE_REFERENCE {
+						goto_HANDLE_REFERENCE = false
+						goto HANDLE_REFERENCE
+					}
 					recno = -escape
 				HANDLE_REFERENCE:
 					;
