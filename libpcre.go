@@ -9037,15 +9037,13 @@ func compile_branch(optionsptr *int32, codeptr **pcre_uchar, ptrptr **pcre_uchar
 					}()) != pcre_uint32((uint32('\x00')))) || ((nestptr != nil) && (func() pcre_uint32 {
 						ptr = nestptr
 						nestptr = nil
-						tempVar := &(func() pcre_uint32 {
-							tempVar := pcre_uint32((uint32(uint8((*func() *pcre_uchar {
+						return (func() pcre_uint32 {
+							c = pcre_uint32((uint32(uint8((*func() *pcre_uchar {
 								ptr = ((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ptr)) + (uintptr)(1)*unsafe.Sizeof(*ptr))))
 								return ptr
 							}())))))
-							c = tempVar
-							return tempVar
+							return c
 						}())
-						return *tempVar
 					}() != pcre_uint32((uint32('\x00')))))) && ((c != pcre_uint32((uint32(']')))) || (int32((inescq)) != 0)))])) != 0 {
 						break
 					}
