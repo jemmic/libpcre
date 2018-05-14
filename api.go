@@ -30,79 +30,80 @@ package libpcre
 
 import (
 	"fmt"
+	"github.com/elliotchance/c2go/noarch"
 	"strconv"
 	"unsafe"
 )
 
 // Flags for Compile and Match functions.
 const (
-	ANCHORED          = PCRE_ANCHORED
-	BSR_ANYCRLF       = PCRE_BSR_ANYCRLF
-	BSR_UNICODE       = PCRE_BSR_UNICODE
-	NEWLINE_ANY       = PCRE_NEWLINE_ANY
-	NEWLINE_ANYCRLF   = PCRE_NEWLINE_ANYCRLF
-	NEWLINE_CR        = PCRE_NEWLINE_CR
-	NEWLINE_CRLF      = PCRE_NEWLINE_CRLF
-	NEWLINE_LF        = PCRE_NEWLINE_LF
-	NO_START_OPTIMIZE = PCRE_NO_START_OPTIMIZE
-	NO_UTF8_CHECK     = PCRE_NO_UTF8_CHECK
+	ANCHORED          = int(pcre_ANCHORED)
+	BSR_ANYCRLF       = int(pcre_BSR_ANYCRLF)
+	BSR_UNICODE       = int(pcre_BSR_UNICODE)
+	NEWLINE_ANY       = int(pcre_NEWLINE_ANY)
+	NEWLINE_ANYCRLF   = int(pcre_NEWLINE_ANYCRLF)
+	NEWLINE_CR        = int(pcre_NEWLINE_CR)
+	NEWLINE_CRLF      = int(pcre_NEWLINE_CRLF)
+	NEWLINE_LF        = int(pcre_NEWLINE_LF)
+	NO_START_OPTIMIZE = int(pcre_NO_START_OPTIMIZE)
+	NO_UTF8_CHECK     = int(pcre_NO_UTF8_CHECK)
 )
 
 // Flags for Compile functions
 const (
-	CASELESS          = PCRE_CASELESS
-	DOLLAR_ENDONLY    = PCRE_DOLLAR_ENDONLY
-	DOTALL            = PCRE_DOTALL
-	DUPNAMES          = PCRE_DUPNAMES
-	EXTENDED          = PCRE_EXTENDED
-	EXTRA             = PCRE_EXTRA
-	FIRSTLINE         = PCRE_FIRSTLINE
-	JAVASCRIPT_COMPAT = PCRE_JAVASCRIPT_COMPAT
-	MULTILINE         = PCRE_MULTILINE
-	NEVER_UTF         = PCRE_NEVER_UTF
-	NO_AUTO_CAPTURE   = PCRE_NO_AUTO_CAPTURE
-	UNGREEDY          = PCRE_UNGREEDY
-	UTF8              = PCRE_UTF8
-	UCP               = PCRE_UCP
+	CASELESS          = int(pcre_CASELESS)
+	DOLLAR_ENDONLY    = int(pcre_DOLLAR_ENDONLY)
+	DOTALL            = int(pcre_DOTALL)
+	DUPNAMES          = int(pcre_DUPNAMES)
+	EXTENDED          = int(pcre_EXTENDED)
+	EXTRA             = int(pcre_EXTRA)
+	FIRSTLINE         = int(pcre_FIRSTLINE)
+	JAVASCRIPT_COMPAT = int(pcre_JAVASCRIPT_COMPAT)
+	MULTILINE         = int(pcre_MULTILINE)
+	NEVER_UTF         = int(pcre_NEVER_UTF)
+	NO_AUTO_CAPTURE   = int(pcre_NO_AUTO_CAPTURE)
+	UNGREEDY          = int(pcre_UNGREEDY)
+	UTF8              = int(pcre_UTF8)
+	UCP               = int(pcre_UCP)
 )
 
 // Flags for Match functions
 const (
-	NOTBOL           = PCRE_NOTBOL
-	NOTEOL           = PCRE_NOTEOL
-	NOTEMPTY         = PCRE_NOTEMPTY
-	NOTEMPTY_ATSTART = PCRE_NOTEMPTY_ATSTART
-	PARTIAL_HARD     = PCRE_PARTIAL_HARD
-	PARTIAL_SOFT     = PCRE_PARTIAL_SOFT
+	NOTBOL           = int(pcre_NOTBOL)
+	NOTEOL           = int(pcre_NOTEOL)
+	NOTEMPTY         = int(pcre_NOTEMPTY)
+	NOTEMPTY_ATSTART = int(pcre_NOTEMPTY_ATSTART)
+	PARTIAL_HARD     = int(pcre_PARTIAL_HARD)
+	PARTIAL_SOFT     = int(pcre_PARTIAL_SOFT)
 )
 
 // Flags for Study function
 const (
-	STUDY_JIT_COMPILE              = PCRE_STUDY_JIT_COMPILE
-	STUDY_JIT_PARTIAL_SOFT_COMPILE = PCRE_STUDY_JIT_PARTIAL_SOFT_COMPILE
-	STUDY_JIT_PARTIAL_HARD_COMPILE = PCRE_STUDY_JIT_PARTIAL_HARD_COMPILE
+	STUDY_JIT_COMPILE              = int(pcre_STUDY_JIT_COMPILE)
+	STUDY_JIT_PARTIAL_SOFT_COMPILE = int(pcre_STUDY_JIT_PARTIAL_SOFT_COMPILE)
+	STUDY_JIT_PARTIAL_HARD_COMPILE = int(pcre_STUDY_JIT_PARTIAL_HARD_COMPILE)
 )
 
 // Exec-time and get/set-time error codes
 const (
-	ERROR_NOMATCH        = PCRE_ERROR_NOMATCH
-	ERROR_NULL           = PCRE_ERROR_NULL
-	ERROR_BADOPTION      = PCRE_ERROR_BADOPTION
-	ERROR_BADMAGIC       = PCRE_ERROR_BADMAGIC
-	ERROR_UNKNOWN_OPCODE = PCRE_ERROR_UNKNOWN_OPCODE
-	ERROR_UNKNOWN_NODE   = PCRE_ERROR_UNKNOWN_NODE
-	ERROR_NOMEMORY       = PCRE_ERROR_NOMEMORY
-	ERROR_NOSUBSTRING    = PCRE_ERROR_NOSUBSTRING
-	ERROR_MATCHLIMIT     = PCRE_ERROR_MATCHLIMIT
-	ERROR_CALLOUT        = PCRE_ERROR_CALLOUT
-	ERROR_BADUTF8        = PCRE_ERROR_BADUTF8
-	ERROR_BADUTF8_OFFSET = PCRE_ERROR_BADUTF8_OFFSET
-	ERROR_PARTIAL        = PCRE_ERROR_PARTIAL
-	ERROR_BADPARTIAL     = PCRE_ERROR_BADPARTIAL
-	ERROR_RECURSIONLIMIT = PCRE_ERROR_RECURSIONLIMIT
-	ERROR_INTERNAL       = PCRE_ERROR_INTERNAL
-	ERROR_BADCOUNT       = PCRE_ERROR_BADCOUNT
-	ERROR_JIT_STACKLIMIT = PCRE_ERROR_JIT_STACKLIMIT
+	ERROR_NOMATCH        = int(pcre_ERROR_NOMATCH)
+	ERROR_NULL           = int(pcre_ERROR_NULL)
+	ERROR_BADOPTION      = int(pcre_ERROR_BADOPTION)
+	ERROR_BADMAGIC       = int(pcre_ERROR_BADMAGIC)
+	ERROR_UNKNOWN_OPCODE = int(pcre_ERROR_UNKNOWN_OPCODE)
+	ERROR_UNKNOWN_NODE   = int(pcre_ERROR_UNKNOWN_NODE)
+	ERROR_NOMEMORY       = int(pcre_ERROR_NOMEMORY)
+	ERROR_NOSUBSTRING    = int(pcre_ERROR_NOSUBSTRING)
+	ERROR_MATCHLIMIT     = int(pcre_ERROR_MATCHLIMIT)
+	ERROR_CALLOUT        = int(pcre_ERROR_CALLOUT)
+	ERROR_BADUTF8        = int(pcre_ERROR_BADUTF8)
+	ERROR_BADUTF8_OFFSET = int(pcre_ERROR_BADUTF8_OFFSET)
+	ERROR_PARTIAL        = int(pcre_ERROR_PARTIAL)
+	ERROR_BADPARTIAL     = int(pcre_ERROR_BADPARTIAL)
+	ERROR_RECURSIONLIMIT = int(pcre_ERROR_RECURSIONLIMIT)
+	ERROR_INTERNAL       = int(pcre_ERROR_INTERNAL)
+	ERROR_BADCOUNT       = int(pcre_ERROR_BADCOUNT)
+	ERROR_JIT_STACKLIMIT = int(pcre_ERROR_JIT_STACKLIMIT)
 )
 
 // Regexp holds a reference to a compiled regular expression.
@@ -114,14 +115,14 @@ type Regexp struct {
 
 // Number of bytes in the compiled pattern
 func pcreSize(ptr *pcre) (size size_t) {
-	pcre_fullinfo(ptr, nil, PCRE_INFO_SIZE, unsafe.Pointer(&size))
+	pcre_fullinfo((*(*[]pcre)(unsafe.Pointer(ptr)))[:], nil, pcre_INFO_SIZE, unsafe.Pointer(&size))
 	return
 }
 
 // Number of capture groups
-func pcreGroups(ptr *pcre) (count int) {
-	pcre_fullinfo(ptr, nil,
-		PCRE_INFO_CAPTURECOUNT, unsafe.Pointer(&count))
+func pcreGroups(ptr *pcre) (count int32) {
+	pcre_fullinfo((*(*[]pcre)(unsafe.Pointer(ptr)))[:], nil,
+		pcre_INFO_CAPTURECOUNT, unsafe.Pointer(&count))
 	return
 }
 
@@ -150,7 +151,7 @@ func Compile(pattern string, flags int) (Regexp, error) {
 	}
 	var errptr *char
 	var erroffset int
-	ptr := pcre_compile(pattern1, int(flags), &errptr, &erroffset, nil)
+	ptr := pcre_compile(pattern1, int32(flags), &errptr, &erroffset, nil)
 	if ptr == nil {
 		return Regexp{}, &CompileError{
 			Pattern: pattern,
@@ -204,8 +205,8 @@ func (re *Regexp) Study(flags int) error {
 	}
 
 	ptr := (*pcre)(unsafe.Pointer(&re.ptr[0]))
-	var err *char
-	extra := pcre_study(ptr, int(flags), &err)
+	var err []byte
+	extra := pcre_study((*(*[]pcre)(unsafe.Pointer(ptr)))[:], int32(flags), (*(*[][]byte)(unsafe.Pointer(&err)))[:])
 	if err != nil {
 		return fmt.Errorf("%s", GoString(err))
 	}
@@ -213,15 +214,15 @@ func (re *Regexp) Study(flags int) error {
 		// Studying the pattern may not produce useful information.
 		return nil
 	}
-	defer free(unsafe.Pointer(extra))
+	//defer free(unsafe.Pointer(extra))
 
 	var size size_t
-	rc := pcre_fullinfo(ptr, extra, PCRE_INFO_JITSIZE, unsafe.Pointer(&size))
+	rc := pcre_fullinfo((*(*[]pcre)(unsafe.Pointer(ptr)))[:], extra, pcre_INFO_JITSIZE, unsafe.Pointer(&size))
 	if rc != 0 || size == 0 {
 		return fmt.Errorf("Study failed to obtain JIT size (%d)", int(rc))
 	}
 	re.extra = make([]byte, int(size))
-	memcpy(unsafe.Pointer(&re.extra[0]), unsafe.Pointer(extra), size)
+	noarch.Memcpy(re.extra, extra, int32(size))
 	return nil
 }
 
@@ -239,7 +240,7 @@ func (re Regexp) Groups() int {
 type Matcher struct {
 	re       Regexp
 	groups   int
-	ovector  []int // scratch space for capture offsets
+	ovector  []int32 // scratch space for capture offsets
 	matches  bool    // last match was successful
 	partial  bool    // was the last match a partial match?
 	subjects string  // one of these fields is set to record the subject,
@@ -298,7 +299,7 @@ func (m *Matcher) Init(re *Regexp) {
 	m.re = *re
 	m.groups = re.Groups()
 	if ovectorlen := 3 * (1 + m.groups); len(m.ovector) < ovectorlen {
-		m.ovector = make([]int, ovectorlen)
+		m.ovector = make([]int32, ovectorlen)
 	}
 }
 
@@ -312,7 +313,7 @@ func (m *Matcher) Match(subject []byte, flags int) bool {
 		panic("Matcher.Match: uninitialized")
 	}
 	rc := m.Exec(subject, flags)
-	m.matches = matched(rc)
+	m.matches = matched(int32(rc))
 	m.partial = (rc == ERROR_PARTIAL)
 	return m.matches
 }
@@ -325,7 +326,7 @@ func (m *Matcher) MatchString(subject string, flags int) bool {
 		panic("Matcher.MatchString: uninitialized")
 	}
 	rc := m.ExecString(subject, flags)
-	m.matches = matched(rc)
+	m.matches = matched(int32(rc))
 	m.partial = (rc == ERROR_PARTIAL)
 	return m.matches
 }
@@ -342,8 +343,8 @@ func (m *Matcher) Exec(subject []byte, flags int) int {
 	if length == 0 {
 		subject = nullbyte // make first character adressable
 	}
-	subjectptr := (*char)(unsafe.Pointer(&subject[0]))
-	return m.exec(subjectptr, length, flags)
+	//subjectptr := (*char)(unsafe.Pointer(&subject[0]))
+	return m.exec(subject, length, flags)
 }
 
 // ExecString tries to match the specified subject string to
@@ -359,32 +360,32 @@ func (m *Matcher) ExecString(subject string, flags int) int {
 		subject = "\000" // make first character addressable
 	}
 	// The following is a non-portable kludge to avoid a copy
-	subjectptr := *(**char)(unsafe.Pointer(&subject))
-	return m.exec(subjectptr, length, flags)
+	//subjectptr := *(**char)(unsafe.Pointer(&subject))
+	return m.exec([]byte(subject), length, flags)
 }
 
-func (m *Matcher) exec(subjectptr *char, length, flags int) int {
+func (m *Matcher) exec(subjectptr []byte, length, flags int) int {
 	var extra *pcre_extra
 	if m.re.extra != nil {
 		extra = (*pcre_extra)(unsafe.Pointer(&m.re.extra[0]))
 	}
-	rc := pcre_exec((*pcre)(unsafe.Pointer(&m.re.ptr[0])), extra,
-		subjectptr, int(length),
-		0, int(flags), &m.ovector[0], int(len(m.ovector)))
+	rc := pcre_exec((*(*[]pcre)(unsafe.Pointer(&m.re.ptr[0])))[:], (*(*[]pcre_extra)(unsafe.Pointer(extra)))[:],
+		subjectptr, int32(length),
+		0, int32(flags), (*(*[]int32)(unsafe.Pointer(&m.ovector[0])))[:], int32(len(m.ovector)))
 	return int(rc)
 }
 
 // matched checks the return code of a pattern match for success.
-func matched(rc int) bool {
+func matched(rc int32) bool {
 	switch {
-	case rc >= 0 || rc == PCRE_ERROR_PARTIAL:
+	case rc >= 0 || rc == pcre_ERROR_PARTIAL:
 		return true
-	case rc == PCRE_ERROR_NOMATCH:
+	case rc == pcre_ERROR_NOMATCH:
 		return false
-	case rc == PCRE_ERROR_BADOPTION:
+	case rc == pcre_ERROR_BADOPTION:
 		panic("PCRE.Match: invalid option flag")
 	}
-	panic("unexpected return code from pcre_exec: " + strconv.Itoa(rc))
+	panic("unexpected return code from pcre_exec: " + strconv.Itoa(int(rc)))
 }
 
 // Matches returns true if a previous call to Matcher, MatcherString, Reset,
@@ -512,9 +513,9 @@ func (m *Matcher) name2index(name string) (int, error) {
 		return 0, fmt.Errorf("Matcher.Named: uninitialized")
 	}
 	name1 := CString(name)
-	defer free(unsafe.Pointer(name1))
+	//defer free(unsafe.Pointer(name1))
 	group := int(pcre_get_stringnumber(
-		(*pcre)(unsafe.Pointer(&m.re.ptr[0])), name1))
+		(*(*[]pcre)(unsafe.Pointer(&m.re.ptr[0])))[:], name1))
 	if group < 0 {
 		return group, fmt.Errorf("Matcher.Named: unknown name: " + name)
 	}
