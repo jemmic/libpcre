@@ -1201,11 +1201,13 @@ func main() {
 	for (argc > int32(1)) && (int32(**((**byte)(unsafe.Pointer(uintptr(unsafe.Pointer(argv)) + (uintptr)(op)*unsafe.Sizeof(*argv))))) == int32('-')) {
 		var endptr *pcre_uint8
 		var arg *byte = *((**byte)(unsafe.Pointer(uintptr(unsafe.Pointer(argv)) + (uintptr)(op)*unsafe.Sizeof(*argv))))
-		if noarch.Strcmp(arg, (&[]byte("-m\x00")[0])) == int32(0) {
+		var goto_BAD_ARG bool
+	BAD_ARG_CONTAINER:
+		if !goto_BAD_ARG && noarch.Strcmp(arg, (&[]byte("-m\x00")[0])) == int32(0) {
 			showstore = int32(1)
-		} else if noarch.Strcmp(arg, (&[]byte("-s\x00")[0])) == int32(0) {
+		} else if !goto_BAD_ARG && noarch.Strcmp(arg, (&[]byte("-s\x00")[0])) == int32(0) {
 			force_study = int32(0)
-		} else if noarch.Strncmp(arg, (&[]byte("-s+\x00")[0]), int32(uint32(int32(3)))) == int32(0) {
+		} else if !goto_BAD_ARG && noarch.Strncmp(arg, (&[]byte("-s+\x00")[0]), int32(uint32(int32(3)))) == int32(0) {
 			arg = ((*byte)(unsafe.Pointer(uintptr(unsafe.Pointer(arg)) + (uintptr)(int32(3))*unsafe.Sizeof(*arg))))
 			if int32(*arg) == int32('+') {
 				arg = ((*byte)(unsafe.Pointer(uintptr(unsafe.Pointer(arg)) + (uintptr)(1)*unsafe.Sizeof(*arg))))
@@ -1223,32 +1225,33 @@ func main() {
 					return unsafe.Pointer(uintptr(unsafe.Pointer(tempVar)) + (uintptr)((int32(*arg)-int32('1')))*unsafe.Sizeof(*tempVar))
 				}()))
 			} else {
-				goto BAD_ARG
+				goto_BAD_ARG = true
+				goto BAD_ARG_CONTAINER
 			}
-		} else if noarch.Strcmp(arg, (&[]byte("-8\x00")[0])) == int32(0) {
+		} else if !goto_BAD_ARG && noarch.Strcmp(arg, (&[]byte("-8\x00")[0])) == int32(0) {
 			pcre_mode = PCRE8_MODE
-		} else if noarch.Strcmp(arg, (&[]byte("-16\x00")[0])) == int32(0) {
+		} else if !goto_BAD_ARG && noarch.Strcmp(arg, (&[]byte("-16\x00")[0])) == int32(0) {
 			noarch.Printf((&[]byte("** This version of PCRE was built without 16-bit support\n\x00")[0]))
 			noarch.Exit(int32(1))
-		} else if noarch.Strcmp(arg, (&[]byte("-32\x00")[0])) == int32(0) {
+		} else if !goto_BAD_ARG && noarch.Strcmp(arg, (&[]byte("-32\x00")[0])) == int32(0) {
 			noarch.Printf((&[]byte("** This version of PCRE was built without 32-bit support\n\x00")[0]))
 			noarch.Exit(int32(1))
-		} else if noarch.Strcmp(arg, (&[]byte("-q\x00")[0])) == int32(0) {
+		} else if !goto_BAD_ARG && noarch.Strcmp(arg, (&[]byte("-q\x00")[0])) == int32(0) {
 			quiet = int32(1)
-		} else if noarch.Strcmp(arg, (&[]byte("-b\x00")[0])) == int32(0) {
+		} else if !goto_BAD_ARG && noarch.Strcmp(arg, (&[]byte("-b\x00")[0])) == int32(0) {
 			debug = int32(1)
-		} else if noarch.Strcmp(arg, (&[]byte("-i\x00")[0])) == int32(0) {
+		} else if !goto_BAD_ARG && noarch.Strcmp(arg, (&[]byte("-i\x00")[0])) == int32(0) {
 			showinfo = int32(1)
-		} else if noarch.Strcmp(arg, (&[]byte("-d\x00")[0])) == int32(0) {
+		} else if !goto_BAD_ARG && noarch.Strcmp(arg, (&[]byte("-d\x00")[0])) == int32(0) {
 			debug = int32(1)
 			showinfo = debug
-		} else if noarch.Strcmp(arg, (&[]byte("-M\x00")[0])) == int32(0) {
+		} else if !goto_BAD_ARG && noarch.Strcmp(arg, (&[]byte("-M\x00")[0])) == int32(0) {
 			default_find_match_limit = int32(1)
-		} else if noarch.Strcmp(arg, (&[]byte("-O\x00")[0])) == int32(0) {
+		} else if !goto_BAD_ARG && noarch.Strcmp(arg, (&[]byte("-O\x00")[0])) == int32(0) {
 			default_options |= pcre_uint32((uint32(int32(131072))))
-		} else if noarch.Strcmp(arg, (&[]byte("-dfa\x00")[0])) == int32(0) {
+		} else if !goto_BAD_ARG && noarch.Strcmp(arg, (&[]byte("-dfa\x00")[0])) == int32(0) {
 			all_use_dfa = int32(1)
-		} else if ((noarch.Strcmp(arg, (&[]byte("-o\x00")[0])) == int32(0)) && (argc > int32(2))) && func() bool {
+		} else if !goto_BAD_ARG && ((noarch.Strcmp(arg, (&[]byte("-o\x00")[0])) == int32(0)) && (argc > int32(2))) && func() bool {
 			(func() int32 {
 				size_offsets = get_value((*pcre_uint8)(unsafe.Pointer(*((**byte)(unsafe.Pointer(uintptr(unsafe.Pointer(argv)) + (uintptr)((op+int32(1)))*unsafe.Sizeof(*argv)))))), &endptr)
 				return size_offsets
@@ -1257,7 +1260,7 @@ func main() {
 		}() {
 			op += 1
 			argc -= 1
-		} else if (((noarch.Strcmp(arg, (&[]byte("-t\x00")[0])) == int32(0)) || (noarch.Strcmp(arg, (&[]byte("-tm\x00")[0])) == int32(0))) || (noarch.Strcmp(arg, (&[]byte("-T\x00")[0])) == int32(0))) || (noarch.Strcmp(arg, (&[]byte("-TM\x00")[0])) == int32(0)) {
+		} else if !goto_BAD_ARG && ((((noarch.Strcmp(arg, (&[]byte("-t\x00")[0])) == int32(0)) || (noarch.Strcmp(arg, (&[]byte("-tm\x00")[0])) == int32(0))) || (noarch.Strcmp(arg, (&[]byte("-T\x00")[0])) == int32(0))) || (noarch.Strcmp(arg, (&[]byte("-TM\x00")[0])) == int32(0))) {
 			var temp int32
 			var both int32 = map[bool]int32{false: 0, true: 1}[(int32(*((*byte)(unsafe.Pointer(uintptr(unsafe.Pointer(arg)) + (uintptr)(int32(2))*unsafe.Sizeof(*arg))))) == int32(0))]
 			showtotaltimes = map[bool]int32{false: 0, true: 1}[(int32(*((*byte)(unsafe.Pointer(uintptr(unsafe.Pointer(arg)) + (uintptr)(int32(1))*unsafe.Sizeof(*arg))))) == int32('T'))]
@@ -1274,7 +1277,7 @@ func main() {
 			if both != 0 {
 				timeit = timeitm
 			}
-		} else if ((noarch.Strcmp(arg, (&[]byte("-S\x00")[0])) == int32(0)) && (argc > int32(2))) && func() bool {
+		} else if !goto_BAD_ARG && ((noarch.Strcmp(arg, (&[]byte("-S\x00")[0])) == int32(0)) && (argc > int32(2))) && func() bool {
 			(func() int32 {
 				stack_size = get_value((*pcre_uint8)(unsafe.Pointer(*((**byte)(unsafe.Pointer(uintptr(unsafe.Pointer(argv)) + (uintptr)((op+int32(1)))*unsafe.Sizeof(*argv)))))), &endptr)
 				return stack_size
@@ -1292,9 +1295,9 @@ func main() {
 			}
 			op += 1
 			argc -= 1
-		} else if noarch.Strcmp(arg, (&[]byte("-p\x00")[0])) == int32(0) {
+		} else if !goto_BAD_ARG && noarch.Strcmp(arg, (&[]byte("-p\x00")[0])) == int32(0) {
 			posix = int32(1)
-		} else if noarch.Strcmp(arg, (&[]byte("-C\x00")[0])) == int32(0) {
+		} else if !goto_BAD_ARG && noarch.Strcmp(arg, (&[]byte("-C\x00")[0])) == int32(0) {
 			var rc int32
 			var lrc uint32
 			if argc > int32(2) {
@@ -1413,12 +1416,15 @@ func main() {
 			}
 			noarch.Printf((&[]byte("\n\x00")[0]))
 			goto EXIT
-		} else if (noarch.Strcmp(arg, (&[]byte("-help\x00")[0])) == int32(0)) || (noarch.Strcmp(arg, (&[]byte("--help\x00")[0])) == int32(0)) {
+		} else if !goto_BAD_ARG && ((noarch.Strcmp(arg, (&[]byte("-help\x00")[0])) == int32(0)) || (noarch.Strcmp(arg, (&[]byte("--help\x00")[0])) == int32(0))) {
 			usage()
 			goto EXIT
 		} else {
+			if goto_BAD_ARG {
+				goto BAD_ARG
+			}
 		BAD_ARG:
-			;
+			goto_BAD_ARG = false
 			noarch.Printf((&[]byte("** Unknown or malformed option %s\n\x00")[0]), arg)
 			usage()
 			yield = int32(1)
