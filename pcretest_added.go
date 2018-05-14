@@ -44,3 +44,15 @@ func CStringToString(s []byte) string {
 
 	return string(newSlice)
 }
+
+func pcre_assign_jit_stack(pcre_extra []pcre_extra, pcre_jit_callback func(arg interface{}) []pcre_jit_stack, userdata interface{}) {
+	panic("not implemented")
+}
+
+func pcre_jit_stack_alloc(startsize int32, maxsize int32) []pcre_jit_stack {
+	panic("not implemented")
+}
+
+func pcre_jit_stack_free(stack []pcre_jit_stack) {
+	panic("not implemented")
+}
