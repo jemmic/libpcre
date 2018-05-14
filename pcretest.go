@@ -1248,25 +1248,23 @@ func main() {
 			default_options |= pcre_uint32((uint32(int32(131072))))
 		} else if noarch.Strcmp(arg, (&[]byte("-dfa\x00")[0])) == int32(0) {
 			all_use_dfa = int32(1)
-		} else if ((noarch.Strcmp(arg, (&[]byte("-o\x00")[0])) == int32(0)) && (argc > int32(2))) && (func() int32 {
+		} else if ((noarch.Strcmp(arg, (&[]byte("-o\x00")[0])) == int32(0)) && (argc > int32(2))) && func() bool {
 			(func() int32 {
 				size_offsets = get_value((*pcre_uint8)(unsafe.Pointer(*((**byte)(unsafe.Pointer(uintptr(unsafe.Pointer(argv)) + (uintptr)((op+int32(1)))*unsafe.Sizeof(*argv)))))), &endptr)
 				return size_offsets
 			}())
-			tempVar := &(int32(uint8((*endptr))) == int32(0))
-			return *tempVar
-		}() != 0) {
+			return int32(uint8((*endptr))) == int32(0)
+		}() {
 			op += 1
 			argc -= 1
 		} else if (((noarch.Strcmp(arg, (&[]byte("-t\x00")[0])) == int32(0)) || (noarch.Strcmp(arg, (&[]byte("-tm\x00")[0])) == int32(0))) || (noarch.Strcmp(arg, (&[]byte("-T\x00")[0])) == int32(0))) || (noarch.Strcmp(arg, (&[]byte("-TM\x00")[0])) == int32(0)) {
 			var temp int32
 			var both int32 = map[bool]int32{false: 0, true: 1}[(int32(*((*byte)(unsafe.Pointer(uintptr(unsafe.Pointer(arg)) + (uintptr)(int32(2))*unsafe.Sizeof(*arg))))) == int32(0))]
 			showtotaltimes = map[bool]int32{false: 0, true: 1}[(int32(*((*byte)(unsafe.Pointer(uintptr(unsafe.Pointer(arg)) + (uintptr)(int32(1))*unsafe.Sizeof(*arg))))) == int32('T'))]
-			if (argc > int32(2)) && (func() int32 {
+			if (argc > int32(2)) && func() bool {
 				temp = get_value((*pcre_uint8)(unsafe.Pointer(*((**byte)(unsafe.Pointer(uintptr(unsafe.Pointer(argv)) + (uintptr)((op+int32(1)))*unsafe.Sizeof(*argv)))))), &endptr)
-				tempVar := &(int32(uint8((*endptr))) == int32(0))
-				return *tempVar
-			}() != 0) {
+				return int32(uint8((*endptr))) == int32(0)
+			}() {
 				timeitm = temp
 				op += 1
 				argc -= 1
@@ -1276,14 +1274,13 @@ func main() {
 			if both != 0 {
 				timeit = timeitm
 			}
-		} else if ((noarch.Strcmp(arg, (&[]byte("-S\x00")[0])) == int32(0)) && (argc > int32(2))) && (func() int32 {
+		} else if ((noarch.Strcmp(arg, (&[]byte("-S\x00")[0])) == int32(0)) && (argc > int32(2))) && func() bool {
 			(func() int32 {
 				stack_size = get_value((*pcre_uint8)(unsafe.Pointer(*((**byte)(unsafe.Pointer(uintptr(unsafe.Pointer(argv)) + (uintptr)((op+int32(1)))*unsafe.Sizeof(*argv)))))), &endptr)
 				return stack_size
 			}())
-			tempVar := &(int32(uint8((*endptr))) == int32(0))
-			return *tempVar
-		}() != 0) {
+			return int32(uint8((*endptr))) == int32(0)
+		}() {
 			var rc int32
 			var rlim rlimit
 			getrlimit(int32(RLIMIT_STACK), &rlim)
