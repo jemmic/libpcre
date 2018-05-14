@@ -1489,6 +1489,7 @@ func main() {
 		var delimiter int32
 		var poffset int32
 		var dfa_matched int32 = int32(0)
+		var goto_SKIP_DATA bool
 		use_utf = int32(0)
 		debug_lengths = int32(1)
 		pcre_stack_guard = nil
@@ -1706,7 +1707,8 @@ func main() {
 			return unsafe.Pointer(uintptr(unsafe.Pointer(tempVar)) + (uintptr)((delimiter))*unsafe.Sizeof(*tempVar))
 		}()))) & int32(uint16(_ISalnum))) != 0) || (delimiter == int32('\\')) {
 			noarch.Fprintf(outfile, (&[]byte("** Delimiter must not be alphanumeric or \\\n\x00")[0]))
-			goto SKIP_DATA
+			goto_SKIP_DATA = true
+			goto SKIP_DATA_CONTAINER_OUTER
 		}
 		pp = p
 		poffset = (int32((int64(uintptr(unsafe.Pointer(p))) - int64(uintptr(unsafe.Pointer(buffer))))))
@@ -1759,7 +1761,8 @@ func main() {
 				if (int32(uint8((*pp))) == int32('<')) && (noarch.Strchr((*byte)(unsafe.Pointer(&lockout[0])), int32('>')) != nil) {
 					var x int32 = check_mc_option(((*pcre_uint8)(unsafe.Pointer(uintptr(unsafe.Pointer(pp)) + (uintptr)(int32(1))*unsafe.Sizeof(*pp)))), outfile, BOOL((int32(0))), (&[]byte("modifier\x00")[0]))
 					if x == int32(0) {
-						goto SKIP_DATA
+						goto_SKIP_DATA = true
+						goto SKIP_DATA_CONTAINER_OUTER
 					}
 					for ppp = &lockout[0]; int32(uint8((*ppp))) != int32(0); ppp = ((*pcre_uint8)(unsafe.Pointer(uintptr(unsafe.Pointer(ppp)) + (uintptr)(1)*unsafe.Sizeof(*ppp)))) {
 						if int32(uint8((*ppp))) == int32('<') {
@@ -2006,7 +2009,8 @@ func main() {
 				default:
 					{
 						noarch.Fprintf(outfile, (&[]byte("** Missing 0 or 1 after /Q\n\x00")[0]))
-						goto SKIP_DATA
+						goto_SKIP_DATA = true
+						goto SKIP_DATA_CONTAINER_OUTER
 					}
 				}
 				pcre_stack_guard = stack_guard
@@ -2136,13 +2140,15 @@ func main() {
 				case int32(0):
 					{
 						noarch.Fprintf(outfile, (&[]byte("** Missing table number after /T\n\x00")[0]))
-						goto SKIP_DATA
+						goto_SKIP_DATA = true
+						goto SKIP_DATA_CONTAINER_OUTER
 					}
 					fallthrough
 				default:
 					{
 						noarch.Fprintf(outfile, (&[]byte("** Bad table number \"%c\" after /T\n\x00")[0]), int32(uint8((pcre_uint8(*((*pcre_uint8)(unsafe.Pointer(uintptr(unsafe.Pointer(pp)) - (uintptr)(1)*unsafe.Sizeof(*pp)))))))))
-						goto SKIP_DATA
+						goto_SKIP_DATA = true
+						goto SKIP_DATA_CONTAINER_OUTER
 					}
 				}
 			}
@@ -2156,7 +2162,8 @@ func main() {
 				*ppp = pcre_uint8(int32(0))
 				if setlocale(int32(0), (*byte)(unsafe.Pointer(pp))) == nil {
 					noarch.Fprintf(outfile, (&[]byte("** Failed to set locale \"%s\"\n\x00")[0]), pp)
-					goto SKIP_DATA
+					goto_SKIP_DATA = true
+					goto SKIP_DATA_CONTAINER_OUTER
 				}
 				locale_set = int32(1)
 				tables = (*pcre_uint8)(unsafe.Pointer(pcre_maketables()))
@@ -2182,7 +2189,8 @@ func main() {
 			{
 				var x int32 = check_mc_option(pp, outfile, BOOL((int32(0))), (&[]byte("modifier\x00")[0]))
 				if x == int32(0) {
-					goto SKIP_DATA
+					goto_SKIP_DATA = true
+					goto SKIP_DATA_CONTAINER_OUTER
 				}
 				options |= x
 				for int32(uint8((*func() *pcre_uint8 {
@@ -2205,11 +2213,13 @@ func main() {
 		SW_GENERATED_LABEL_40:
 			{
 				noarch.Fprintf(outfile, (&[]byte("** Unknown modifier '%c'\n\x00")[0]), int32(uint8((pcre_uint8(*((*pcre_uint8)(unsafe.Pointer(uintptr(unsafe.Pointer(pp)) - (uintptr)(1)*unsafe.Sizeof(*pp)))))))))
-				goto SKIP_DATA
+				goto_SKIP_DATA = true
+				goto SKIP_DATA_CONTAINER_OUTER
 			}
 		SW_GENERATED_LABEL_0:
 		}
-		if (posix != 0) || (do_posix != 0) {
+	SKIP_DATA_CONTAINER_OUTER:
+		if !goto_SKIP_DATA && ((posix != 0) || (do_posix != 0)) {
 			var rc int32
 			var cflags int32 = int32(0)
 			if (options & int32(1)) != int32(0) {
@@ -2237,9 +2247,13 @@ func main() {
 			if rc != int32(0) {
 				_ = regerror(rc, &preg, (*byte)(unsafe.Pointer(buffer)), size_t(buffer_size))
 				noarch.Fprintf(outfile, (&[]byte("Failed: POSIX code %d: %s\n\x00")[0]), rc, buffer)
-				goto SKIP_DATA
+				goto_SKIP_DATA = true
+				goto SKIP_DATA_CONTAINER_OUTER
 			}
 		} else {
+			if goto_SKIP_DATA {
+				goto SKIP_DATA_CONTAINER
+			}
 			if timeit > int32(0) {
 				var i int32
 				var time_taken clock_t
@@ -2258,10 +2272,14 @@ func main() {
 				noarch.Fprintf(outfile, (&[]byte("Compile time %.4f milliseconds\n\x00")[0]), (((float64(int32((__clock_t((clock_t(time_taken)))))) * 1000) / float64(timeit)) / float64(int32((__clock_t((clock_t(int32(1000000)))))))))
 			}
 			re = pcre_compile((*byte)(unsafe.Pointer(p)), options, &error, &erroroffset, (*uint8)(unsafe.Pointer(tables)))
-			if re == nil {
+		SKIP_DATA_CONTAINER:
+			if goto_SKIP_DATA || re == nil {
+				if goto_SKIP_DATA {
+					goto SKIP_DATA
+				}
 				noarch.Fprintf(outfile, (&[]byte("Failed: %s at offset %d\n\x00")[0]), error, erroroffset)
 			SKIP_DATA:
-				;
+				goto_SKIP_DATA = false
 				if int64(uintptr(unsafe.Pointer(infile))) != int64(uintptr(unsafe.Pointer(stdin))) {
 					for {
 						if extend_inputline(infile, buffer, nil) == nil {
@@ -2284,7 +2302,8 @@ func main() {
 				goto CONTINUE
 			}
 			if new_info(re, nil, int32(0), unsafe.Pointer(&get_options)) < int32(0) {
-				goto SKIP_DATA
+				goto_SKIP_DATA = true
+				goto SKIP_DATA_CONTAINER_OUTER
 			}
 			if (get_options & uint32(int32(2048))) != uint32(int32(0)) {
 				use_utf = int32(1)
@@ -2367,7 +2386,8 @@ func main() {
 				var namecount int32
 				var nametable *pcre_uint8
 				if (((((((((((((new_info(re, nil, int32(2), unsafe.Pointer(&count)) + new_info(re, nil, int32(3), unsafe.Pointer(&backrefmax))) + new_info(re, nil, int32(19), unsafe.Pointer(&first_char))) + new_info(re, nil, int32(20), unsafe.Pointer(&first_char_set))) + new_info(re, nil, int32(21), unsafe.Pointer(&need_char))) + new_info(re, nil, int32(22), unsafe.Pointer(&need_char_set))) + new_info(re, nil, int32(7), unsafe.Pointer(&nameentrysize))) + new_info(re, nil, int32(8), unsafe.Pointer(&namecount))) + new_info(re, nil, int32(9), unsafe.Pointer(&nametable))) + new_info(re, nil, int32(12), unsafe.Pointer(&okpartial))) + new_info(re, nil, int32(13), unsafe.Pointer(&jchanged))) + new_info(re, nil, int32(14), unsafe.Pointer(&hascrorlf))) + new_info(re, nil, int32(25), unsafe.Pointer(&match_empty))) + new_info(re, nil, int32(18), unsafe.Pointer(&maxlookbehind))) != int32(0) {
-					goto SKIP_DATA
+					goto_SKIP_DATA = true
+					goto SKIP_DATA_CONTAINER_OUTER
 				}
 				noarch.Fprintf(outfile, (&[]byte("Capturing subpattern count = %d\n\x00")[0]), count)
 				if backrefmax > int32(0) {
@@ -3601,7 +3621,8 @@ func main() {
 							noarch.Fprintf(outfile, (&[]byte("** Show all captures ignored after DFA matching\n\x00")[0]))
 						} else {
 							if new_info(re, nil, int32(2), unsafe.Pointer(&count)) < int32(0) {
-								goto SKIP_DATA
+								goto_SKIP_DATA = true
+								goto SKIP_DATA_CONTAINER_OUTER
 							}
 							count += 1
 							if (count * int32(2)) > use_size_offsets {
