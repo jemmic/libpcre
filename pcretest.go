@@ -1496,6 +1496,7 @@ func main() {
 		var poffset int32
 		var dfa_matched int32 = int32(0)
 		var goto_SKIP_DATA bool
+		var goto_SHOW_INFO bool
 		use_utf = int32(0)
 		debug_lengths = int32(1)
 		pcre_stack_guard = nil
@@ -1712,7 +1713,8 @@ func main() {
 			}
 			use_utf = map[bool]int32{false: 0, true: 1}[((get_options & uint32(int32(2048))) != uint32(int32(0)))]
 			noarch.Fclose(f)
-			goto SHOW_INFO
+			goto_SHOW_INFO = true
+			goto SHOW_INFO_CONTAINER
 		}
 		delimiter = int32(uint8((*func() *pcre_uint8 {
 			defer func() {
@@ -2236,8 +2238,9 @@ func main() {
 			}
 		SW_GENERATED_LABEL_0:
 		}
+	SHOW_INFO_CONTAINER:
 	SKIP_DATA_CONTAINER_OUTER:
-		if !goto_SKIP_DATA && ((posix != 0) || (do_posix != 0)) {
+		if !goto_SHOW_INFO && !goto_SKIP_DATA && ((posix != 0) || (do_posix != 0)) {
 			var rc int32
 			var cflags int32 = int32(0)
 			if (options & int32(1)) != int32(0) {
@@ -2271,6 +2274,9 @@ func main() {
 		} else {
 			if goto_SKIP_DATA {
 				goto SKIP_DATA_CONTAINER
+			}
+			if goto_SHOW_INFO {
+				goto SHOW_INFO
 			}
 			if timeit > int32(0) {
 				var i int32
@@ -2380,7 +2386,7 @@ func main() {
 				(*extra).flags |= uint32(int32(32))
 			}
 		SHOW_INFO:
-			;
+			goto_SHOW_INFO = false
 			if do_debug != 0 {
 				noarch.Fprintf(outfile, (&[]byte("------------------------------------------------------------------\n\x00")[0]))
 				pcre_printint(re, outfile, BOOL((debug_lengths)))
