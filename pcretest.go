@@ -1,3 +1,5 @@
+// +build pcretest
+
 package libpcre
 
 import "os"
