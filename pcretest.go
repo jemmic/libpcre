@@ -4151,6 +4151,7 @@ func pcre_printint(external_re *pcre, f *noarch.File, print_lengths BOOL) {
 		var flag *byte = (&[]byte("  \x00")[0])
 		var c pcre_uint32
 		var extra uint32 = uint32(int32(0))
+		var goto_CLASS_REF_REPEAT bool
 		if int32((BOOL(print_lengths))) != 0 {
 			noarch.Fprintf(f, (&[]byte("%3d \x00")[0]), (int32((int64(uintptr(unsafe.Pointer(code))) - int64(uintptr(unsafe.Pointer(codestart)))))))
 		} else {
@@ -4580,7 +4581,8 @@ func pcre_printint(external_re *pcre, f *noarch.File, print_lengths BOOL) {
 					tempVar := &priv_OP_lengths[0]
 					return unsafe.Pointer(uintptr(unsafe.Pointer(tempVar)) + (uintptr)(int32(uint8((*code))))*unsafe.Sizeof(*tempVar))
 				}()))))))*unsafe.Sizeof(*code))))
-				goto CLASS_REF_REPEAT
+				goto_CLASS_REF_REPEAT = true
+				goto CLASS_REF_REPEAT_CONTAINER
 			}
 			fallthrough
 		case OP_DNREFI:
@@ -4607,7 +4609,8 @@ func pcre_printint(external_re *pcre, f *noarch.File, print_lengths BOOL) {
 					tempVar := &priv_OP_lengths[0]
 					return unsafe.Pointer(uintptr(unsafe.Pointer(tempVar)) + (uintptr)(int32(uint8((*code))))*unsafe.Sizeof(*tempVar))
 				}()))))))*unsafe.Sizeof(*code))))
-				goto CLASS_REF_REPEAT
+				goto_CLASS_REF_REPEAT = true
+				goto CLASS_REF_REPEAT_CONTAINER
 			}
 			fallthrough
 		case OP_CALLOUT:
@@ -4628,218 +4631,7 @@ func pcre_printint(external_re *pcre, f *noarch.File, print_lengths BOOL) {
 		case OP_NCLASS:
 			fallthrough
 		case OP_XCLASS:
-			{
-				var i int32
-				var min uint32
-				var max uint32
-				var printmap BOOL
-				var invertmap BOOL = BOOL((int32(0)))
-				var map_ *pcre_uint8
-				var inverted_map []pcre_uint8 = make([]pcre_uint8, 32, 32)
-				noarch.Fprintf(f, (&[]byte("    [\x00")[0]))
-				if int32(uint8((*code))) == OP_XCLASS {
-					extra = uint32(((int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer((code))) + (uintptr)(int32(1))*unsafe.Sizeof(*(code)))))))) << uint64(int32(8))) | int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer((code))) + (uintptr)((int32(1)+int32(1)))*unsafe.Sizeof(*(code))))))))))
-					ccode = ((*pcre_uchar)(func() unsafe.Pointer {
-						tempVar := ((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(code)) + (uintptr)(int32(2))*unsafe.Sizeof(*code))))
-						return unsafe.Pointer(uintptr(unsafe.Pointer(tempVar)) + (uintptr)(int32(1))*unsafe.Sizeof(*tempVar))
-					}()))
-					printmap = BOOL((map[bool]int32{false: 0, true: 1}[((int32(uint8((*ccode))) & int32(2)) != int32(0))]))
-					if (int32(uint8((*ccode))) & int32(1)) != int32(0) {
-						invertmap = BOOL((map[bool]int32{false: 0, true: 1}[((int32(uint8((*ccode))) & int32(4)) == int32(0))]))
-						noarch.Fprintf(f, (&[]byte("^\x00")[0]))
-					}
-					ccode = ((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ccode)) + (uintptr)(1)*unsafe.Sizeof(*ccode))))
-				} else {
-					printmap = BOOL((int32(1)))
-					ccode = ((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(code)) + (uintptr)(int32(1))*unsafe.Sizeof(*code))))
-				}
-				if int32((BOOL(printmap))) != 0 {
-					map_ = (*pcre_uint8)(unsafe.Pointer(ccode))
-					if int32((BOOL(invertmap))) != 0 {
-						for i = int32(0); i < int32(32); i++ {
-							*((*pcre_uint8)(func() unsafe.Pointer {
-								tempVar := &inverted_map[0]
-								return unsafe.Pointer(uintptr(unsafe.Pointer(tempVar)) + (uintptr)(i)*unsafe.Sizeof(*tempVar))
-							}())) = pcre_uint8((^uint8(int32(uint8((pcre_uint8(*((*pcre_uint8)(unsafe.Pointer(uintptr(unsafe.Pointer(map_)) + (uintptr)(i)*unsafe.Sizeof(*map_)))))))))))
-						}
-						map_ = &inverted_map[0]
-					}
-					for i = int32(0); i < int32(256); i++ {
-						if (int32(uint8((*((*pcre_uint8)(unsafe.Pointer(uintptr(unsafe.Pointer(map_)) + (uintptr)((i/int32(8)))*unsafe.Sizeof(*map_))))))) & (int32(1) << uint64((i & int32(7))))) != int32(0) {
-							var j int32
-							for j = (i + int32(1)); j < int32(256); j++ {
-								if (int32(uint8((*((*pcre_uint8)(unsafe.Pointer(uintptr(unsafe.Pointer(map_)) + (uintptr)((j/int32(8)))*unsafe.Sizeof(*map_))))))) & (int32(1) << uint64((j & int32(7))))) == int32(0) {
-									break
-								}
-							}
-							if (i == int32('-')) || (i == int32(']')) {
-								noarch.Fprintf(f, (&[]byte("\\\x00")[0]))
-							}
-							if (map[bool]int32{false: 0, true: 1}[((i >= int32(32)) && (i < int32(127)))]) != 0 {
-								noarch.Fprintf(f, (&[]byte("%c\x00")[0]), i)
-							} else {
-								noarch.Fprintf(f, (&[]byte("\\x%02x\x00")[0]), i)
-							}
-							if func() int32 {
-								j -= 1
-								return j
-							}() > i {
-								if j != (i + int32(1)) {
-									noarch.Fprintf(f, (&[]byte("-\x00")[0]))
-								}
-								if (j == int32('-')) || (j == int32(']')) {
-									noarch.Fprintf(f, (&[]byte("\\\x00")[0]))
-								}
-								if (map[bool]int32{false: 0, true: 1}[((j >= int32(32)) && (j < int32(127)))]) != 0 {
-									noarch.Fprintf(f, (&[]byte("%c\x00")[0]), j)
-								} else {
-									noarch.Fprintf(f, (&[]byte("\\x%02x\x00")[0]), j)
-								}
-							}
-							i = j
-						}
-					}
-					ccode = ((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ccode)) + (uintptr)(int32((uint32(int32(32))/1)))*unsafe.Sizeof(*ccode))))
-				}
-				if int32(uint8((*code))) == OP_XCLASS {
-					var ch pcre_uchar
-					for int32(uint8((func() pcre_uchar {
-						tempVar := *func() *pcre_uchar {
-							defer func() {
-								ccode = ((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ccode)) + (uintptr)(1)*unsafe.Sizeof(*ccode))))
-							}()
-							return ccode
-						}()
-						ch = tempVar
-						return tempVar
-					}()))) != int32(0) {
-						var not BOOL = BOOL((int32(0)))
-						var notch *byte = (&[]byte("\x00")[0])
-						switch int32(uint8((pcre_uchar(ch)))) {
-						case int32(4):
-							{
-								not = BOOL((int32(1)))
-								notch = (&[]byte("^\x00")[0])
-							}
-							fallthrough
-						case int32(3):
-							{
-								var ptype uint32 = uint32(uint8((*func() *pcre_uchar {
-									defer func() {
-										ccode = ((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ccode)) + (uintptr)(1)*unsafe.Sizeof(*ccode))))
-									}()
-									return ccode
-								}())))
-								var pvalue uint32 = uint32(uint8((*func() *pcre_uchar {
-									defer func() {
-										ccode = ((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ccode)) + (uintptr)(1)*unsafe.Sizeof(*ccode))))
-									}()
-									return ccode
-								}())))
-								switch ptype {
-								case uint32(int32(11)):
-									{
-										noarch.Fprintf(f, (&[]byte("[:%sgraph:]\x00")[0]), notch)
-									}
-								case uint32(int32(12)):
-									{
-										noarch.Fprintf(f, (&[]byte("[:%sprint:]\x00")[0]), notch)
-									}
-								case uint32(int32(13)):
-									{
-										noarch.Fprintf(f, (&[]byte("[:%spunct:]\x00")[0]), notch)
-									}
-								default:
-									{
-										noarch.Fprintf(f, (&[]byte("\\%c{%s}\x00")[0]), (func() int32 {
-											if int32((BOOL(not))) != 0 {
-												return int32('P')
-											} else {
-												return int32('p')
-											}
-										}()), get_ucpname(ptype, pvalue))
-										break
-									}
-								}
-							}
-						default:
-							{
-								ccode = ((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ccode)) + (uintptr)(int32((uint32(int32(1))+print_char(f, ccode, BOOL(utf)))))*unsafe.Sizeof(*ccode))))
-								if int32(uint8((ch))) == int32(2) {
-									noarch.Fprintf(f, (&[]byte("-\x00")[0]))
-									ccode = ((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ccode)) + (uintptr)(int32((uint32(int32(1))+print_char(f, ccode, BOOL(utf)))))*unsafe.Sizeof(*ccode))))
-								}
-								break
-							}
-						}
-					}
-				}
-				noarch.Fprintf(f, (&[]byte("]%s\x00")[0]), func() *byte {
-					if (map[bool]int32{false: 0, true: 1}[(int32(uint8((*code))) == OP_NCLASS)]) != 0 {
-						return (&[]byte(" (neg)\x00")[0])
-					} else {
-						return (&[]byte("\x00")[0])
-					}
-				}())
-			CLASS_REF_REPEAT:
-				;
-				switch int32(uint8((pcre_uchar(*ccode)))) {
-				case OP_CRSTAR:
-					fallthrough
-				case OP_CRMINSTAR:
-					fallthrough
-				case OP_CRPLUS:
-					fallthrough
-				case OP_CRMINPLUS:
-					fallthrough
-				case OP_CRQUERY:
-					fallthrough
-				case OP_CRMINQUERY:
-					fallthrough
-				case OP_CRPOSSTAR:
-					fallthrough
-				case OP_CRPOSPLUS:
-					fallthrough
-				case OP_CRPOSQUERY:
-					{
-						noarch.Fprintf(f, (&[]byte("%s\x00")[0]), *((**byte)(func() unsafe.Pointer {
-							tempVar := &priv_OP_names[0]
-							return unsafe.Pointer(uintptr(unsafe.Pointer(tempVar)) + (uintptr)(int32(uint8((*ccode))))*unsafe.Sizeof(*tempVar))
-						}())))
-						extra += uint32(uint8((*((*pcre_uint8)(func() unsafe.Pointer {
-							tempVar := &priv_OP_lengths[0]
-							return unsafe.Pointer(uintptr(unsafe.Pointer(tempVar)) + (uintptr)(int32(uint8((*ccode))))*unsafe.Sizeof(*tempVar))
-						}())))))
-					}
-				case OP_CRRANGE:
-					fallthrough
-				case OP_CRMINRANGE:
-					fallthrough
-				case OP_CRPOSRANGE:
-					{
-						min = uint32(((int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer((ccode))) + (uintptr)(int32(1))*unsafe.Sizeof(*(ccode)))))))) << uint64(int32(8))) | int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer((ccode))) + (uintptr)((int32(1)+int32(1)))*unsafe.Sizeof(*(ccode))))))))))
-						max = uint32(((int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer((ccode))) + (uintptr)((int32(1)+int32(2)))*unsafe.Sizeof(*(ccode)))))))) << uint64(int32(8))) | int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer((ccode))) + (uintptr)(((int32(1)+int32(2))+int32(1)))*unsafe.Sizeof(*(ccode))))))))))
-						if max == uint32(int32(0)) {
-							noarch.Fprintf(f, (&[]byte("{%u,}\x00")[0]), min)
-						} else {
-							noarch.Fprintf(f, (&[]byte("{%u,%u}\x00")[0]), min, max)
-						}
-						if int32(uint8((*ccode))) == OP_CRMINRANGE {
-							noarch.Fprintf(f, (&[]byte("?\x00")[0]))
-						} else if int32(uint8((*ccode))) == OP_CRPOSRANGE {
-							noarch.Fprintf(f, (&[]byte("+\x00")[0]))
-						}
-						extra += uint32(uint8((*((*pcre_uint8)(func() unsafe.Pointer {
-							tempVar := &priv_OP_lengths[0]
-							return unsafe.Pointer(uintptr(unsafe.Pointer(tempVar)) + (uintptr)(int32(uint8((*ccode))))*unsafe.Sizeof(*tempVar))
-						}())))))
-					}
-				default:
-					{
-						break
-					}
-				}
-			}
+			goto SW_GENERATED_LABEL_41
 		case OP_MARK:
 			fallthrough
 		case OP_PRUNE_ARG:
@@ -4878,6 +4670,227 @@ func pcre_printint(external_re *pcre, f *noarch.File, print_lengths BOOL) {
 				break
 			}
 		}
+		goto SW_GENERATED_LABEL_42
+	CLASS_REF_REPEAT_CONTAINER:
+		;
+	SW_GENERATED_LABEL_41:
+		{
+			var i int32
+			var min uint32
+			var max uint32
+			var printmap BOOL
+			var invertmap BOOL = BOOL((int32(0)))
+			var map_ *pcre_uint8
+			var inverted_map []pcre_uint8 = make([]pcre_uint8, 32, 32)
+			if goto_CLASS_REF_REPEAT {
+				goto CLASS_REF_REPEAT
+			}
+			noarch.Fprintf(f, (&[]byte("    [\x00")[0]))
+			if int32(uint8((*code))) == OP_XCLASS {
+				extra = uint32(((int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer((code))) + (uintptr)(int32(1))*unsafe.Sizeof(*(code)))))))) << uint64(int32(8))) | int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer((code))) + (uintptr)((int32(1)+int32(1)))*unsafe.Sizeof(*(code))))))))))
+				ccode = ((*pcre_uchar)(func() unsafe.Pointer {
+					tempVar := ((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(code)) + (uintptr)(int32(2))*unsafe.Sizeof(*code))))
+					return unsafe.Pointer(uintptr(unsafe.Pointer(tempVar)) + (uintptr)(int32(1))*unsafe.Sizeof(*tempVar))
+				}()))
+				printmap = BOOL((map[bool]int32{false: 0, true: 1}[((int32(uint8((*ccode))) & int32(2)) != int32(0))]))
+				if (int32(uint8((*ccode))) & int32(1)) != int32(0) {
+					invertmap = BOOL((map[bool]int32{false: 0, true: 1}[((int32(uint8((*ccode))) & int32(4)) == int32(0))]))
+					noarch.Fprintf(f, (&[]byte("^\x00")[0]))
+				}
+				ccode = ((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ccode)) + (uintptr)(1)*unsafe.Sizeof(*ccode))))
+			} else {
+				printmap = BOOL((int32(1)))
+				ccode = ((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(code)) + (uintptr)(int32(1))*unsafe.Sizeof(*code))))
+			}
+			if int32((BOOL(printmap))) != 0 {
+				map_ = (*pcre_uint8)(unsafe.Pointer(ccode))
+				if int32((BOOL(invertmap))) != 0 {
+					for i = int32(0); i < int32(32); i++ {
+						*((*pcre_uint8)(func() unsafe.Pointer {
+							tempVar := &inverted_map[0]
+							return unsafe.Pointer(uintptr(unsafe.Pointer(tempVar)) + (uintptr)(i)*unsafe.Sizeof(*tempVar))
+						}())) = pcre_uint8((^uint8(int32(uint8((pcre_uint8(*((*pcre_uint8)(unsafe.Pointer(uintptr(unsafe.Pointer(map_)) + (uintptr)(i)*unsafe.Sizeof(*map_)))))))))))
+					}
+					map_ = &inverted_map[0]
+				}
+				for i = int32(0); i < int32(256); i++ {
+					if (int32(uint8((*((*pcre_uint8)(unsafe.Pointer(uintptr(unsafe.Pointer(map_)) + (uintptr)((i/int32(8)))*unsafe.Sizeof(*map_))))))) & (int32(1) << uint64((i & int32(7))))) != int32(0) {
+						var j int32
+						for j = (i + int32(1)); j < int32(256); j++ {
+							if (int32(uint8((*((*pcre_uint8)(unsafe.Pointer(uintptr(unsafe.Pointer(map_)) + (uintptr)((j/int32(8)))*unsafe.Sizeof(*map_))))))) & (int32(1) << uint64((j & int32(7))))) == int32(0) {
+								break
+							}
+						}
+						if (i == int32('-')) || (i == int32(']')) {
+							noarch.Fprintf(f, (&[]byte("\\\x00")[0]))
+						}
+						if (map[bool]int32{false: 0, true: 1}[((i >= int32(32)) && (i < int32(127)))]) != 0 {
+							noarch.Fprintf(f, (&[]byte("%c\x00")[0]), i)
+						} else {
+							noarch.Fprintf(f, (&[]byte("\\x%02x\x00")[0]), i)
+						}
+						if func() int32 {
+							j -= 1
+							return j
+						}() > i {
+							if j != (i + int32(1)) {
+								noarch.Fprintf(f, (&[]byte("-\x00")[0]))
+							}
+							if (j == int32('-')) || (j == int32(']')) {
+								noarch.Fprintf(f, (&[]byte("\\\x00")[0]))
+							}
+							if (map[bool]int32{false: 0, true: 1}[((j >= int32(32)) && (j < int32(127)))]) != 0 {
+								noarch.Fprintf(f, (&[]byte("%c\x00")[0]), j)
+							} else {
+								noarch.Fprintf(f, (&[]byte("\\x%02x\x00")[0]), j)
+							}
+						}
+						i = j
+					}
+				}
+				ccode = ((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ccode)) + (uintptr)(int32((uint32(int32(32))/1)))*unsafe.Sizeof(*ccode))))
+			}
+			if int32(uint8((*code))) == OP_XCLASS {
+				var ch pcre_uchar
+				for int32(uint8((func() pcre_uchar {
+					tempVar := *func() *pcre_uchar {
+						defer func() {
+							ccode = ((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ccode)) + (uintptr)(1)*unsafe.Sizeof(*ccode))))
+						}()
+						return ccode
+					}()
+					ch = tempVar
+					return tempVar
+				}()))) != int32(0) {
+					var not BOOL = BOOL((int32(0)))
+					var notch *byte = (&[]byte("\x00")[0])
+					switch int32(uint8((pcre_uchar(ch)))) {
+					case int32(4):
+						{
+							not = BOOL((int32(1)))
+							notch = (&[]byte("^\x00")[0])
+						}
+						fallthrough
+					case int32(3):
+						{
+							var ptype uint32 = uint32(uint8((*func() *pcre_uchar {
+								defer func() {
+									ccode = ((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ccode)) + (uintptr)(1)*unsafe.Sizeof(*ccode))))
+								}()
+								return ccode
+							}())))
+							var pvalue uint32 = uint32(uint8((*func() *pcre_uchar {
+								defer func() {
+									ccode = ((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ccode)) + (uintptr)(1)*unsafe.Sizeof(*ccode))))
+								}()
+								return ccode
+							}())))
+							switch ptype {
+							case uint32(int32(11)):
+								{
+									noarch.Fprintf(f, (&[]byte("[:%sgraph:]\x00")[0]), notch)
+								}
+							case uint32(int32(12)):
+								{
+									noarch.Fprintf(f, (&[]byte("[:%sprint:]\x00")[0]), notch)
+								}
+							case uint32(int32(13)):
+								{
+									noarch.Fprintf(f, (&[]byte("[:%spunct:]\x00")[0]), notch)
+								}
+							default:
+								{
+									noarch.Fprintf(f, (&[]byte("\\%c{%s}\x00")[0]), (func() int32 {
+										if int32((BOOL(not))) != 0 {
+											return int32('P')
+										} else {
+											return int32('p')
+										}
+									}()), get_ucpname(ptype, pvalue))
+									break
+								}
+							}
+						}
+					default:
+						{
+							ccode = ((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ccode)) + (uintptr)(int32((uint32(int32(1))+print_char(f, ccode, BOOL(utf)))))*unsafe.Sizeof(*ccode))))
+							if int32(uint8((ch))) == int32(2) {
+								noarch.Fprintf(f, (&[]byte("-\x00")[0]))
+								ccode = ((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ccode)) + (uintptr)(int32((uint32(int32(1))+print_char(f, ccode, BOOL(utf)))))*unsafe.Sizeof(*ccode))))
+							}
+							break
+						}
+					}
+				}
+			}
+			noarch.Fprintf(f, (&[]byte("]%s\x00")[0]), func() *byte {
+				if (map[bool]int32{false: 0, true: 1}[(int32(uint8((*code))) == OP_NCLASS)]) != 0 {
+					return (&[]byte(" (neg)\x00")[0])
+				} else {
+					return (&[]byte("\x00")[0])
+				}
+			}())
+		CLASS_REF_REPEAT:
+			goto_CLASS_REF_REPEAT = false
+			switch int32(uint8((pcre_uchar(*ccode)))) {
+			case OP_CRSTAR:
+				fallthrough
+			case OP_CRMINSTAR:
+				fallthrough
+			case OP_CRPLUS:
+				fallthrough
+			case OP_CRMINPLUS:
+				fallthrough
+			case OP_CRQUERY:
+				fallthrough
+			case OP_CRMINQUERY:
+				fallthrough
+			case OP_CRPOSSTAR:
+				fallthrough
+			case OP_CRPOSPLUS:
+				fallthrough
+			case OP_CRPOSQUERY:
+				{
+					noarch.Fprintf(f, (&[]byte("%s\x00")[0]), *((**byte)(func() unsafe.Pointer {
+						tempVar := &priv_OP_names[0]
+						return unsafe.Pointer(uintptr(unsafe.Pointer(tempVar)) + (uintptr)(int32(uint8((*ccode))))*unsafe.Sizeof(*tempVar))
+					}())))
+					extra += uint32(uint8((*((*pcre_uint8)(func() unsafe.Pointer {
+						tempVar := &priv_OP_lengths[0]
+						return unsafe.Pointer(uintptr(unsafe.Pointer(tempVar)) + (uintptr)(int32(uint8((*ccode))))*unsafe.Sizeof(*tempVar))
+					}())))))
+				}
+			case OP_CRRANGE:
+				fallthrough
+			case OP_CRMINRANGE:
+				fallthrough
+			case OP_CRPOSRANGE:
+				{
+					min = uint32(((int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer((ccode))) + (uintptr)(int32(1))*unsafe.Sizeof(*(ccode)))))))) << uint64(int32(8))) | int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer((ccode))) + (uintptr)((int32(1)+int32(1)))*unsafe.Sizeof(*(ccode))))))))))
+					max = uint32(((int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer((ccode))) + (uintptr)((int32(1)+int32(2)))*unsafe.Sizeof(*(ccode)))))))) << uint64(int32(8))) | int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer((ccode))) + (uintptr)(((int32(1)+int32(2))+int32(1)))*unsafe.Sizeof(*(ccode))))))))))
+					if max == uint32(int32(0)) {
+						noarch.Fprintf(f, (&[]byte("{%u,}\x00")[0]), min)
+					} else {
+						noarch.Fprintf(f, (&[]byte("{%u,%u}\x00")[0]), min, max)
+					}
+					if int32(uint8((*ccode))) == OP_CRMINRANGE {
+						noarch.Fprintf(f, (&[]byte("?\x00")[0]))
+					} else if int32(uint8((*ccode))) == OP_CRPOSRANGE {
+						noarch.Fprintf(f, (&[]byte("+\x00")[0]))
+					}
+					extra += uint32(uint8((*((*pcre_uint8)(func() unsafe.Pointer {
+						tempVar := &priv_OP_lengths[0]
+						return unsafe.Pointer(uintptr(unsafe.Pointer(tempVar)) + (uintptr)(int32(uint8((*ccode))))*unsafe.Sizeof(*tempVar))
+					}())))))
+				}
+			default:
+				{
+					break
+				}
+			}
+		}
+	SW_GENERATED_LABEL_42:
+		;
 		code = ((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(code)) + (uintptr)(int32((uint32(uint8((*((*pcre_uint8)(func() unsafe.Pointer {
 			tempVar := &priv_OP_lengths[0]
 			return unsafe.Pointer(uintptr(unsafe.Pointer(tempVar)) + (uintptr)(int32(uint8((*code))))*unsafe.Sizeof(*tempVar))
