@@ -114,8 +114,8 @@ type Regexp struct {
 }
 
 // Number of bytes in the compiled pattern
-func pcreSize(ptr *pcre) (size size_t) {
-	pcre_fullinfo((*(*[]pcre)(unsafe.Pointer(ptr)))[:], nil, pcre_INFO_SIZE, unsafe.Pointer(&size))
+func pcreSize(ptr []pcre) (size size_t) {
+	pcre_fullinfo(ptr, nil, pcre_INFO_SIZE, unsafe.Pointer(&size))
 	return
 }
 
@@ -129,33 +129,31 @@ func pcreGroups(ptr *pcre) (count int32) {
 // Move pattern to the Go heap so that we do not have to use a
 // finalizer.  PCRE patterns are fully relocatable. (We do not use
 // custom character tables.)
-func toHeap(ptr *pcre) (re Regexp) {
-	defer free(unsafe.Pointer(ptr))
+func toHeap(ptr []pcre) (re Regexp) {
 	size := pcreSize(ptr)
 	re.ptr = make([]byte, int(size))
-	memcpy(unsafe.Pointer(&re.ptr[0]), unsafe.Pointer(ptr), size)
+	noarch.Memcpy(&re.ptr[0], ptr, int32(size))
 	return
 }
 
 // Compile the pattern and return a compiled regexp.
 // If compilation fails, the second return value holds a *CompileError.
 func Compile(pattern string, flags int) (Regexp, error) {
-	pattern1 := CString(pattern)
-	defer free(unsafe.Pointer(pattern1))
-	if clen := int(strlen(pattern1)); clen != len(pattern) {
+	pattern1 := noarch.StringToCString(pattern)
+	if clen := int(noarch.Strlen(pattern1)); clen != len(pattern) {
 		return Regexp{}, &CompileError{
 			Pattern: pattern,
 			Message: "NUL byte in pattern",
 			Offset:  clen,
 		}
 	}
-	var errptr *char
-	var erroffset int
-	ptr := pcre_compile(pattern1, int32(flags), &errptr, &erroffset, nil)
+	var errptr []byte
+	var erroffset int32
+	ptr := pcre_compile(pattern1, int32(flags), (*(*[][]byte)(unsafe.Pointer(&errptr)))[:], (*(*[]int32)(unsafe.Pointer(&erroffset)))[:], nil)
 	if ptr == nil {
 		return Regexp{}, &CompileError{
 			Pattern: pattern,
-			Message: GoString(errptr),
+			Message: noarch.CStringToString(errptr),
 			Offset:  int(erroffset),
 		}
 	}
@@ -208,7 +206,7 @@ func (re *Regexp) Study(flags int) error {
 	var err []byte
 	extra := pcre_study((*(*[]pcre)(unsafe.Pointer(ptr)))[:], int32(flags), (*(*[][]byte)(unsafe.Pointer(&err)))[:])
 	if err != nil {
-		return fmt.Errorf("%s", GoString(err))
+		return fmt.Errorf("%s", noarch.CStringToString(err))
 	}
 	if extra == nil {
 		// Studying the pattern may not produce useful information.
@@ -512,8 +510,7 @@ func (m *Matcher) name2index(name string) (int, error) {
 	if m.re.ptr == nil {
 		return 0, fmt.Errorf("Matcher.Named: uninitialized")
 	}
-	name1 := CString(name)
-	//defer free(unsafe.Pointer(name1))
+	name1 := noarch.StringToCString(name)
 	group := int(pcre_get_stringnumber(
 		(*(*[]pcre)(unsafe.Pointer(&m.re.ptr[0])))[:], name1))
 	if group < 0 {
