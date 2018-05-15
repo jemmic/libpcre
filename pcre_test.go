@@ -95,13 +95,16 @@ func goBuildPcretest(tmpDir string) error {
 	}
 	cmd := exec.Command("go", args...)
 	cmd.Dir = tmpDir
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 	return cmd.Run()
 }
 
 func runPcreTest(t *testing.T, tmpDir string) error {
-	cmd := exec.Command("./RunText")
+	cmd := exec.Command("./RunTest")
 	cmd.Dir = tmpDir
 	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 	err := cmd.Run()
 	if err == nil {
 		return nil
@@ -119,6 +122,9 @@ type ShouldCopy func(src string, info os.FileInfo) bool
 func getShouldCopyFunc(srcDir string) ShouldCopy {
 	testdata := filepath.Join(srcDir, "testdata")
 	return func(src string, info os.FileInfo) bool {
+		if srcDir == src {
+			return true
+		}
 		if strings.HasPrefix(src, testdata) {
 			return true
 		}
@@ -199,9 +205,9 @@ func CopyDir(src string, dst string, shouldCopy ShouldCopy) (err error) {
 	if err != nil && !os.IsNotExist(err) {
 		return
 	}
-	if err == nil {
-		return fmt.Errorf("destination already exists")
-	}
+	//if err == nil {
+	//	return fmt.Errorf("destination already exists")
+	//}
 
 	err = os.MkdirAll(dst, si.Mode())
 	if err != nil {
