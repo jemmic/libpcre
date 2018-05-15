@@ -40,12 +40,12 @@ func TestPcre(t *testing.T) {
 		t.Errorf("Cannot change Go package to main: %v", err)
 		return
 	}
-	err = goBuildPcretest(tempDir)
+	err = goBuildPcretest(srcDir, tempDir)
 	if err != nil {
 		t.Errorf("Cannot build pcretest: %v", err)
 		return
 	}
-	err = runPcreTest(t, tempDir)
+	err = runPcreTest(t, srcDir)
 	if err != nil {
 		t.Errorf("Cannot run tests: %v", err)
 		return
@@ -86,7 +86,7 @@ func changeGoPackage2Main(tmpDir string) error {
 	return nil
 }
 
-func goBuildPcretest(tmpDir string) error {
+func goBuildPcretest(srcDir string, tmpDir string) error {
 	args := []string{"build", "-tags", "pcretest", "pcretest.go", "libpcre.go", "pcre_added.go", "pcretest_added.go"}
 	if runtime.GOOS == "linux" {
 		args = append(args, "pcretest_added_linux.go")
@@ -97,12 +97,16 @@ func goBuildPcretest(tmpDir string) error {
 	cmd.Dir = tmpDir
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	return cmd.Run()
+	err := cmd.Run()
+	if err != nil {
+		return err
+	}
+	return CopyFile(filepath.Join(tmpDir, "pcretest"), filepath.Join(srcDir, "pcretest"))
 }
 
-func runPcreTest(t *testing.T, tmpDir string) error {
+func runPcreTest(t *testing.T, srcDir string) error {
 	cmd := exec.Command("./RunTest")
-	cmd.Dir = tmpDir
+	cmd.Dir = srcDir
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	err := cmd.Run()
@@ -120,19 +124,12 @@ func runPcreTest(t *testing.T, tmpDir string) error {
 type ShouldCopy func(src string, info os.FileInfo) bool
 
 func getShouldCopyFunc(srcDir string) ShouldCopy {
-	testdata := filepath.Join(srcDir, "testdata")
 	return func(src string, info os.FileInfo) bool {
 		if srcDir == src {
 			return true
 		}
-		if strings.HasPrefix(src, testdata) {
-			return true
-		}
 		ext := path.Ext(src)
 		if ext == ".go" {
-			return true
-		}
-		if strings.HasSuffix(src, "RunTest") {
 			return true
 		}
 		return false
