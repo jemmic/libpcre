@@ -1561,6 +1561,7 @@ func main() {
 			var magic pcre_uint32
 			var sbuf []pcre_uint8 = make([]pcre_uint8, 8, 8)
 			var f *noarch.File
+			var goto_FAIL_READ bool
 			p = ((*pcre_uint8)(unsafe.Pointer(uintptr(unsafe.Pointer(p)) + (uintptr)(1)*unsafe.Sizeof(*p))))
 			if int32(uint8((*p))) == int32('!') {
 				do_debug = int32(1)
@@ -1581,7 +1582,8 @@ func main() {
 				continue
 			}
 			if noarch.Fread(unsafe.Pointer(&sbuf[0]), int32(int32(1)), int32(int32(8)), f) != int32(uint32(int32(8))) {
-				goto FAIL_READ
+				goto_FAIL_READ = true
+				goto FAIL_READ_CONTAINER_OUTER
 			}
 			true_size = uint32(((((int32(uint8((*&sbuf[0]))) << uint64(int32(24))) | (int32(uint8((*((*pcre_uint8)(func() unsafe.Pointer {
 				tempVar := &sbuf[0]
@@ -1613,7 +1615,8 @@ func main() {
 				goto EXIT
 			}
 			if noarch.Fread(unsafe.Pointer(re), int32(int32(1)), int32(true_size), f) != int32(true_size) {
-				goto FAIL_READ
+				goto_FAIL_READ = true
+				goto FAIL_READ_CONTAINER_OUTER
 			}
 			magic = (*((*real_pcre)(unsafe.Pointer(re)))).magic_number
 			if uint32((magic)) != uint32(1346589253) {
@@ -1633,8 +1636,12 @@ func main() {
 					return (&[]byte("\x00")[0])
 				}
 			}(), p)
-			if true_study_size != uint32(int32(0)) {
+		FAIL_READ_CONTAINER_OUTER:
+			if goto_FAIL_READ || true_study_size != uint32(int32(0)) {
 				var psd *pcre_study_data
+				if goto_FAIL_READ {
+					goto FAIL_READ_CONTAINER
+				}
 				extra = (*pcre_extra)(new_malloc(size_t((64 + true_study_size))))
 				(*extra).flags = uint32(int32(1))
 				psd = (*pcre_study_data)(unsafe.Pointer(((*byte)(func() unsafe.Pointer {
@@ -1642,10 +1649,15 @@ func main() {
 					return unsafe.Pointer(uintptr(unsafe.Pointer(tempVar)) + (uintptr)(int32(64))*unsafe.Sizeof(*tempVar))
 				}()))))
 				(*extra).study_data = unsafe.Pointer(psd)
-				if noarch.Fread(unsafe.Pointer(psd), int32(int32(1)), int32(true_study_size), f) != int32(true_study_size) {
+			FAIL_READ_CONTAINER:
+				if goto_FAIL_READ || noarch.Fread(unsafe.Pointer(psd), int32(int32(1)), int32(true_study_size), f) != int32(true_study_size) {
+					if goto_FAIL_READ {
+						goto FAIL_READ
+					}
 				FAIL_READ:
-					;
+					goto_FAIL_READ = false
 					noarch.Fprintf(outfile, (&[]byte("Failed to read data from %s\n\x00")[0]), p)
+
 					if extra != nil {
 						pcre_free_study(extra)
 					}
