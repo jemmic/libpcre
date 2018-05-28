@@ -5355,7 +5355,7 @@ func compare_opcodes(code *pcre_uchar, utf BOOL, cd *compile_data, base_list *pc
 				if *((*pcre_uint32)(unsafe.Pointer(uintptr(unsafe.Pointer(base_list)) + (uintptr)(int32(1))*unsafe.Sizeof(*base_list)))) == pcre_uint32((uint32(int32(0)))) {
 					return BOOL((int32(0)))
 				}
-				switch int32(uint8((pcre_uchar(*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(code)) + (uintptr)(int32(uint8((int32(0)-((int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer((code))) + (uintptr)(int32(1))*unsafe.Sizeof(*(code))))))))<<uint64(int32(8)))|int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer((code))) + (uintptr)((int32(1)+int32(1)))*unsafe.Sizeof(*(code)))))))))))))*unsafe.Sizeof(*code)))))))) {
+				switch int32(uint8((pcre_uchar(*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(code)) - (uintptr)(int32(uint8(((int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer((code))) + (uintptr)(int32(1))*unsafe.Sizeof(*(code))))))))<<uint64(int32(8)))|int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer((code))) + (uintptr)((int32(1)+int32(1)))*unsafe.Sizeof(*(code))))))))))))*unsafe.Sizeof(*code)))))))) {
 				case OP_ASSERT:
 					fallthrough
 				case OP_ASSERT_NOT:
@@ -15114,7 +15114,7 @@ func internal_dfa_exec(md *dfa_match_data, this_start_code *pcre_uchar, current_
 						return (map[bool]int32{false: 0, true: 1}[(((int64(uintptr(unsafe.Pointer(ptr))) >= int64(uintptr(unsafe.Pointer(((*pcre_uchar)(func() unsafe.Pointer {
 							tempVar := (*md).start_subject
 							return unsafe.Pointer(uintptr(unsafe.Pointer(tempVar)) + (uintptr)((*md).nllen)*unsafe.Sizeof(*tempVar))
-						}())))))) && (int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ptr)) + (uintptr)(int32(uint8((int32(0)-(*md).nllen))))*unsafe.Sizeof(*ptr))))))) == int32(uint8((*&(*md).nl[0]))))) && (((*md).nllen == int32(1)) || (int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ptr)) + (uintptr)(int32(uint8(((int32(0)-(*md).nllen)+int32(1)))))*unsafe.Sizeof(*ptr))))))) == int32(uint8((*((*pcre_uchar)(func() unsafe.Pointer {
+						}())))))) && (int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ptr)) - (uintptr)(int32(uint8(((*md).nllen))))*unsafe.Sizeof(*ptr))))))) == int32(uint8((*&(*md).nl[0]))))) && (((*md).nllen == int32(1)) || (int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(ptr)) - (uintptr)(int32(uint8((((*md).nllen)+int32(1)))))*unsafe.Sizeof(*ptr))))))) == int32(uint8((*((*pcre_uchar)(func() unsafe.Pointer {
 							tempVar := &(*md).nl[0]
 							return unsafe.Pointer(uintptr(unsafe.Pointer(tempVar)) + (uintptr)(int32(1))*unsafe.Sizeof(*tempVar))
 						}()))))))))])
@@ -20017,7 +20017,7 @@ func pcre_dfa_exec(argument_re *pcre, extra_data *pcre_extra, subject *byte, len
 									return (map[bool]int32{false: 0, true: 1}[(((int64(uintptr(unsafe.Pointer(current_subject))) >= int64(uintptr(unsafe.Pointer(((*pcre_uchar)(func() unsafe.Pointer {
 										tempVar := (*md).start_subject
 										return unsafe.Pointer(uintptr(unsafe.Pointer(tempVar)) + (uintptr)((*md).nllen)*unsafe.Sizeof(*tempVar))
-									}())))))) && (int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(current_subject)) + (uintptr)(int32(uint8((int32(0)-(*md).nllen))))*unsafe.Sizeof(*current_subject))))))) == int32(uint8((*&(*md).nl[0]))))) && (((*md).nllen == int32(1)) || (int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(current_subject)) + (uintptr)(int32(uint8(((int32(0)-(*md).nllen)+int32(1)))))*unsafe.Sizeof(*current_subject))))))) == int32(uint8((*((*pcre_uchar)(func() unsafe.Pointer {
+									}())))))) && (int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(current_subject)) - (uintptr)(int32(uint8(((*md).nllen))))*unsafe.Sizeof(*current_subject))))))) == int32(uint8((*&(*md).nl[0]))))) && (((*md).nllen == int32(1)) || (int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(current_subject)) - (uintptr)(int32(uint8(((*md).nllen))))*unsafe.Sizeof(*current_subject) + (uintptr)(int32(1))*unsafe.Sizeof(*current_subject))))))) == int32(uint8((*((*pcre_uchar)(func() unsafe.Pointer {
 										tempVar := &(*md).nl[0]
 										return unsafe.Pointer(uintptr(unsafe.Pointer(tempVar)) + (uintptr)(int32(1))*unsafe.Sizeof(*tempVar))
 									}()))))))))])
@@ -20036,7 +20036,7 @@ func pcre_dfa_exec(argument_re *pcre, extra_data *pcre_extra, subject *byte, len
 									return (map[bool]int32{false: 0, true: 1}[(((int64(uintptr(unsafe.Pointer(current_subject))) >= int64(uintptr(unsafe.Pointer(((*pcre_uchar)(func() unsafe.Pointer {
 										tempVar := (*md).start_subject
 										return unsafe.Pointer(uintptr(unsafe.Pointer(tempVar)) + (uintptr)((*md).nllen)*unsafe.Sizeof(*tempVar))
-									}())))))) && (int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(current_subject)) + (uintptr)(int32(uint8((int32(0)-(*md).nllen))))*unsafe.Sizeof(*current_subject))))))) == int32(uint8((*&(*md).nl[0]))))) && (((*md).nllen == int32(1)) || (int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(current_subject)) + (uintptr)(int32(uint8(((int32(0)-(*md).nllen)+int32(1)))))*unsafe.Sizeof(*current_subject))))))) == int32(uint8((*((*pcre_uchar)(func() unsafe.Pointer {
+									}())))))) && (int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(current_subject)) - (uintptr)(int32(uint8(((*md).nllen))))*unsafe.Sizeof(*current_subject))))))) == int32(uint8((*&(*md).nl[0]))))) && (((*md).nllen == int32(1)) || (int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(current_subject)) - (uintptr)(int32(uint8((*md).nllen)))*unsafe.Sizeof(*current_subject) + (uintptr)(int32(1))*unsafe.Sizeof(*current_subject))))))) == int32(uint8((*((*pcre_uchar)(func() unsafe.Pointer {
 										tempVar := &(*md).nl[0]
 										return unsafe.Pointer(uintptr(unsafe.Pointer(tempVar)) + (uintptr)(int32(1))*unsafe.Sizeof(*tempVar))
 									}()))))))))])
@@ -22934,7 +22934,7 @@ TAIL_RECURSE:
 					return (map[bool]int32{false: 0, true: 1}[(((int64(uintptr(unsafe.Pointer(eptr))) >= int64(uintptr(unsafe.Pointer(((*pcre_uchar)(func() unsafe.Pointer {
 						tempVar := (*md).start_subject
 						return unsafe.Pointer(uintptr(unsafe.Pointer(tempVar)) + (uintptr)((*md).nllen)*unsafe.Sizeof(*tempVar))
-					}())))))) && (int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(eptr)) + (uintptr)(int32(uint8((int32(0)-(*md).nllen))))*unsafe.Sizeof(*eptr))))))) == int32(uint8((*&(*md).nl[0]))))) && (((*md).nllen == int32(1)) || (int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(eptr)) + (uintptr)(int32(uint8(((int32(0)-(*md).nllen)+int32(1)))))*unsafe.Sizeof(*eptr))))))) == int32(uint8((*((*pcre_uchar)(func() unsafe.Pointer {
+					}())))))) && (int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(eptr)) - (uintptr)(int32(uint8((*md).nllen)))*unsafe.Sizeof(*eptr))))))) == int32(uint8((*&(*md).nl[0]))))) && (((*md).nllen == int32(1)) || (int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(eptr)) - (uintptr)(int32(uint8((*md).nllen)))*unsafe.Sizeof(*eptr) + (uintptr)(int32(1))*unsafe.Sizeof(*eptr))))))) == int32(uint8((*((*pcre_uchar)(func() unsafe.Pointer {
 						tempVar := &(*md).nl[0]
 						return unsafe.Pointer(uintptr(unsafe.Pointer(tempVar)) + (uintptr)(int32(1))*unsafe.Sizeof(*tempVar))
 					}()))))))))])
@@ -32034,7 +32034,7 @@ func pcre_exec(argument_re *pcre, extra_data *pcre_extra, subject *byte, length 
 								return (map[bool]int32{false: 0, true: 1}[(((int64(uintptr(unsafe.Pointer(start_match))) >= int64(uintptr(unsafe.Pointer(((*pcre_uchar)(func() unsafe.Pointer {
 									tempVar := (*md).start_subject
 									return unsafe.Pointer(uintptr(unsafe.Pointer(tempVar)) + (uintptr)((*md).nllen)*unsafe.Sizeof(*tempVar))
-								}())))))) && (int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(start_match)) + (uintptr)(int32(uint8((int32(0)-(*md).nllen))))*unsafe.Sizeof(*start_match))))))) == int32(uint8((*&(*md).nl[0]))))) && (((*md).nllen == int32(1)) || (int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(start_match)) + (uintptr)(int32(uint8(((int32(0)-(*md).nllen)+int32(1)))))*unsafe.Sizeof(*start_match))))))) == int32(uint8((*((*pcre_uchar)(func() unsafe.Pointer {
+								}())))))) && (int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(start_match)) - (uintptr)(int32(uint8((*md).nllen)))*unsafe.Sizeof(*start_match))))))) == int32(uint8((*&(*md).nl[0]))))) && (((*md).nllen == int32(1)) || (int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(start_match)) - (uintptr)(int32(uint8(((*md).nllen))))*unsafe.Sizeof(*start_match) + (uintptr)(int32(1))*unsafe.Sizeof(*start_match))))))) == int32(uint8((*((*pcre_uchar)(func() unsafe.Pointer {
 									tempVar := &(*md).nl[0]
 									return unsafe.Pointer(uintptr(unsafe.Pointer(tempVar)) + (uintptr)(int32(1))*unsafe.Sizeof(*tempVar))
 								}()))))))))])
@@ -32053,7 +32053,7 @@ func pcre_exec(argument_re *pcre, extra_data *pcre_extra, subject *byte, length 
 								return (map[bool]int32{false: 0, true: 1}[(((int64(uintptr(unsafe.Pointer(start_match))) >= int64(uintptr(unsafe.Pointer(((*pcre_uchar)(func() unsafe.Pointer {
 									tempVar := (*md).start_subject
 									return unsafe.Pointer(uintptr(unsafe.Pointer(tempVar)) + (uintptr)((*md).nllen)*unsafe.Sizeof(*tempVar))
-								}())))))) && (int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(start_match)) + (uintptr)(int32(uint8((int32(0)-(*md).nllen))))*unsafe.Sizeof(*start_match))))))) == int32(uint8((*&(*md).nl[0]))))) && (((*md).nllen == int32(1)) || (int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(start_match)) + (uintptr)(int32(uint8(((int32(0)-(*md).nllen)+int32(1)))))*unsafe.Sizeof(*start_match))))))) == int32(uint8((*((*pcre_uchar)(func() unsafe.Pointer {
+								}())))))) && (int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(start_match)) - (uintptr)(int32(uint8((*md).nllen)))*unsafe.Sizeof(*start_match))))))) == int32(uint8((*&(*md).nl[0]))))) && (((*md).nllen == int32(1)) || (int32(uint8((*((*pcre_uchar)(unsafe.Pointer(uintptr(unsafe.Pointer(start_match)) - (uintptr)(int32(uint8((*md).nllen)))*unsafe.Sizeof(*start_match) + (uintptr)(int32(1))*unsafe.Sizeof(*start_match))))))) == int32(uint8((*((*pcre_uchar)(func() unsafe.Pointer {
 									tempVar := &(*md).nl[0]
 									return unsafe.Pointer(uintptr(unsafe.Pointer(tempVar)) + (uintptr)(int32(1))*unsafe.Sizeof(*tempVar))
 								}()))))))))])
