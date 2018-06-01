@@ -3485,7 +3485,7 @@ func main() {
 				}()))), unsafe.Pointer(bptr), int32(uint32((len + int32(1)))))
 				bptr = ((*pcre_uint8)(unsafe.Pointer(uintptr(unsafe.Pointer(bptr)) + (uintptr)(int32(uint32(((dbuffer_size-size_t((uint32(len))))-size_t((uint32(int32(1))))))))*unsafe.Sizeof(*bptr))))
 			} else {
-				bptr = (*pcre_uint8)(noarch.Memcpy(unsafe.Pointer(((*pcre_uint8)(unsafe.Pointer(uintptr(unsafe.Pointer(bptr)) + (uintptr)(int32(uint32(((dbuffer_size-size_t((uint32(len))))*size_t((uint32(int32(1))))))))*unsafe.Sizeof(*bptr))))), unsafe.Pointer(bptr), int32(uint32((len * int32(1))))))
+				bptr = (*pcre_uint8)(noarch.Memcpy(unsafe.Pointer(((*pcre_uint8)(unsafe.Pointer(uintptr(unsafe.Pointer(bptr)) + (uintptr)(int32(uint32(((dbuffer_size-size_t((uint32(len)))-size_t(1))*size_t((uint32(int32(1))))))))*unsafe.Sizeof(*bptr))))), unsafe.Pointer(bptr), int32(uint32((len * int32(1))))))
 			}
 			if ((all_use_dfa != 0) || (use_dfa != 0)) && (find_match_limit != 0) {
 				noarch.Printf((&[]byte("** Match limit not relevant for DFA matching: ignored\n\x00")[0]))
