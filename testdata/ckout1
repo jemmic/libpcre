@@ -1,0 +1,16 @@
+/-- This set of tests is for features that are compatible with all versions of
+    Perl >= 5.10, in non-UTF-8 mode. It should run clean for the 8-bit, 16-bit,
+    and 32-bit PCRE libraries. --/
+
+< forbid 89?=ABCDEFfGILMNPTUWXZ<
+
+/([\da-f:]+)$/i
+    fed def
+ 0: def
+ 1: def
+    *** Failers
+No match
+    fed\x20
+No match
+
+/-- End of ckin1 --/
