@@ -1437,6 +1437,9 @@ func main() {
 	}
 	size_offsets_max = size_offsets
 	offsets = (*int32)(noarch.Malloc(int32((uint32(size_offsets_max) * 4))))
+	for i := int32(0); i < size_offsets_max; i++ {
+		*((*int32)(unsafe.Pointer(uintptr(unsafe.Pointer(offsets)) + (uintptr)(i)*unsafe.Sizeof(*offsets)))) = -1
+	}
 	if offsets == nil {
 		noarch.Printf((&[]byte("** Failed to get %d bytes of memory for offsets vector\n\x00")[0]), int32((uint32(size_offsets_max) * 4)))
 		yield = int32(1)
