@@ -87,7 +87,7 @@ func changeGoPackage2Main(tmpDir string) error {
 }
 
 func goBuildPcretest(srcDir string, tmpDir string) error {
-	args := []string{"build", "-tags", "pcretest", "pcretest.go", "libpcre.go", "pcre_added.go", "pcretest_added.go"}
+	args := []string{"build", "-tags", "pcretest", "pcretest.go", "libpcre.go", "api.go", "pcre_constants.go", "pcre_added.go", "pcretest_added.go"}
 	if runtime.GOOS == "linux" {
 		args = append(args, "pcretest_added_linux.go")
 	} else if runtime.GOOS == "darwin" {
