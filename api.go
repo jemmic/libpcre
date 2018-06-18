@@ -114,14 +114,14 @@ type Regexp struct {
 }
 
 // Number of bytes in the compiled pattern
-func pcreSize(ptr []pcre) (size size_t) {
+func pcreSize(ptr *pcre) (size size_t) {
 	pcre_fullinfo(ptr, nil, pcre_INFO_SIZE, unsafe.Pointer(&size))
 	return
 }
 
 // Number of capture groups
 func pcreGroups(ptr *pcre) (count int32) {
-	pcre_fullinfo((*(*[]pcre)(unsafe.Pointer(ptr)))[:], nil,
+	pcre_fullinfo((*pcre)(unsafe.Pointer(ptr)), nil,
 		pcre_INFO_CAPTURECOUNT, unsafe.Pointer(&count))
 	return
 }
@@ -129,10 +129,10 @@ func pcreGroups(ptr *pcre) (count int32) {
 // Move pattern to the Go heap so that we do not have to use a
 // finalizer.  PCRE patterns are fully relocatable. (We do not use
 // custom character tables.)
-func toHeap(ptr []pcre) (re Regexp) {
+func toHeap(ptr *pcre) (re Regexp) {
 	size := pcreSize(ptr)
 	re.ptr = make([]byte, int(size))
-	noarch.Memcpy(re.ptr, ptr, int32(size))
+	noarch.Memcpy(unsafe.Pointer(&re.ptr[0]), unsafe.Pointer(ptr), int32(size))
 	return
 }
 
@@ -147,9 +147,9 @@ func Compile(pattern string, flags int) (Regexp, error) {
 			Offset:  clen,
 		}
 	}
-	var errptr []byte
+	var errptr *byte
 	var erroffset int32
-	ptr := pcre_compile(pattern1, int32(flags), (*(*[][]byte)(unsafe.Pointer(&errptr)))[:], (*(*[]int32)(unsafe.Pointer(&erroffset)))[:], nil)
+	ptr := pcre_compile(pattern1, int32(flags), &errptr, &erroffset, nil)
 	if ptr == nil {
 		return Regexp{}, &CompileError{
 			Pattern: pattern,
@@ -203,8 +203,8 @@ func (re *Regexp) Study(flags int) error {
 	}
 
 	ptr := (*pcre)(unsafe.Pointer(&re.ptr[0]))
-	var err []byte
-	extra := pcre_study((*(*[]pcre)(unsafe.Pointer(ptr)))[:], int32(flags), (*(*[][]byte)(unsafe.Pointer(&err)))[:])
+	var err *byte
+	extra := pcre_study(ptr, int32(flags), &err)
 	if err != nil {
 		return fmt.Errorf("%s", noarch.CStringToString(err))
 	}
@@ -215,12 +215,12 @@ func (re *Regexp) Study(flags int) error {
 	//defer free(unsafe.Pointer(extra))
 
 	var size size_t
-	rc := pcre_fullinfo((*(*[]pcre)(unsafe.Pointer(ptr)))[:], extra, pcre_INFO_JITSIZE, unsafe.Pointer(&size))
+	rc := pcre_fullinfo(ptr, extra, pcre_INFO_JITSIZE, unsafe.Pointer(&size))
 	if rc != 0 || size == 0 {
 		return fmt.Errorf("Study failed to obtain JIT size (%d)", int(rc))
 	}
 	re.extra = make([]byte, int(size))
-	noarch.Memcpy(re.extra, extra, int32(size))
+	noarch.Memcpy(unsafe.Pointer(&re.extra[0]), unsafe.Pointer(extra), int32(size))
 	return nil
 }
 
@@ -342,7 +342,7 @@ func (m *Matcher) Exec(subject []byte, flags int) int {
 		subject = nullbyte // make first character adressable
 	}
 	//subjectptr := (*char)(unsafe.Pointer(&subject[0]))
-	return m.exec(subject, length, flags)
+	return m.exec(&subject[0], length, flags)
 }
 
 // ExecString tries to match the specified subject string to
@@ -359,17 +359,17 @@ func (m *Matcher) ExecString(subject string, flags int) int {
 	}
 	// The following is a non-portable kludge to avoid a copy
 	//subjectptr := *(**char)(unsafe.Pointer(&subject))
-	return m.exec([]byte(subject), length, flags)
+	return m.exec(&append([]byte(subject), 0)[0], length, flags)
 }
 
-func (m *Matcher) exec(subjectptr []byte, length, flags int) int {
+func (m *Matcher) exec(subjectptr *byte, length, flags int) int {
 	var extra *pcre_extra
 	if m.re.extra != nil {
 		extra = (*pcre_extra)(unsafe.Pointer(&m.re.extra[0]))
 	}
-	rc := pcre_exec((*(*[]pcre)(unsafe.Pointer(&m.re.ptr[0])))[:], (*(*[]pcre_extra)(unsafe.Pointer(extra)))[:],
+	rc := pcre_exec((*pcre)(unsafe.Pointer(&m.re.ptr[0])), (*pcre_extra)(unsafe.Pointer(extra)),
 		subjectptr, int32(length),
-		0, int32(flags), (*(*[]int32)(unsafe.Pointer(&m.ovector[0])))[:], int32(len(m.ovector)))
+		0, int32(flags), (*int32)(unsafe.Pointer(&m.ovector[0])), int32(len(m.ovector)))
 	return int(rc)
 }
 
@@ -512,7 +512,7 @@ func (m *Matcher) name2index(name string) (int, error) {
 	}
 	name1 := noarch.StringToCString(name)
 	group := int(pcre_get_stringnumber(
-		(*(*[]pcre)(unsafe.Pointer(&m.re.ptr[0])))[:], name1))
+		(*pcre)(unsafe.Pointer(&m.re.ptr[0])), name1))
 	if group < 0 {
 		return group, fmt.Errorf("Matcher.Named: unknown name: " + name)
 	}
