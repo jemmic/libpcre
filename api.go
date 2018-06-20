@@ -132,7 +132,9 @@ func pcreGroups(ptr *pcre) (count int32) {
 func toHeap(ptr *pcre) (re Regexp) {
 	size := pcreSize(ptr)
 	re.ptr = make([]byte, int(size))
-	noarch.Memcpy(unsafe.Pointer(&re.ptr[0]), unsafe.Pointer(ptr), int32(size))
+	if size > 0 {
+		noarch.Memcpy(unsafe.Pointer(&re.ptr[0]), unsafe.Pointer(ptr), int32(size))
+	}
 	return
 }
 
