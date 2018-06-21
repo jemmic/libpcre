@@ -15,7 +15,11 @@ type real_pcre16_jit_stack unsafe.Pointer
 type real_pcre32_jit_stack unsafe.Pointer
 
 func setlocale(category int32, locale *byte) *byte {
-	return &[]byte(C.GoString(C.setlocale(C.int(category), C.CString(noarch.CStringToString(locale)))))[0]
+	ret := C.setlocale(C.int(category), C.CString(noarch.CStringToString(locale)))
+	if ret == nil {
+		return nil
+	}
+	return &[]byte(C.GoString(ret))[0]
 }
 
 func clock() clock_t {
