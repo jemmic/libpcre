@@ -121,8 +121,7 @@ func pcreSize(ptr *pcre) (size size_t) {
 
 // Number of capture groups
 func pcreGroups(ptr *pcre) (count int32) {
-	pcre_fullinfo((*pcre)(unsafe.Pointer(ptr)), nil,
-		pcre_INFO_CAPTURECOUNT, unsafe.Pointer(&count))
+	pcre_fullinfo(ptr, nil, pcre_INFO_CAPTURECOUNT, unsafe.Pointer(&count))
 	return
 }
 
@@ -130,6 +129,7 @@ func pcreGroups(ptr *pcre) (count int32) {
 // finalizer.  PCRE patterns are fully relocatable. (We do not use
 // custom character tables.)
 func toHeap(ptr *pcre) (re Regexp) {
+	defer noarch.Free(unsafe.Pointer(ptr))
 	size := pcreSize(ptr)
 	re.ptr = make([]byte, int(size))
 	if size > 0 {
@@ -214,7 +214,7 @@ func (re *Regexp) Study(flags int) error {
 		// Studying the pattern may not produce useful information.
 		return nil
 	}
-	//defer free(unsafe.Pointer(extra))
+	defer noarch.Free(unsafe.Pointer(extra))
 
 	var size size_t
 	rc := pcre_fullinfo(ptr, extra, pcre_INFO_JITSIZE, unsafe.Pointer(&size))
@@ -369,7 +369,7 @@ func (m *Matcher) exec(subjectptr *byte, length, flags int) int {
 	if m.re.extra != nil {
 		extra = (*pcre_extra)(unsafe.Pointer(&m.re.extra[0]))
 	}
-	rc := pcre_exec((*pcre)(unsafe.Pointer(&m.re.ptr[0])), (*pcre_extra)(unsafe.Pointer(extra)),
+	rc := pcre_exec((*pcre)(unsafe.Pointer(&m.re.ptr[0])), extra,
 		subjectptr, int32(length),
 		0, int32(flags), (*int32)(unsafe.Pointer(&m.ovector[0])), int32(len(m.ovector)))
 	return int(rc)
@@ -595,4 +595,19 @@ type CompileError struct {
 // Error converts a compile error to a string
 func (e *CompileError) Error() string {
 	return e.Pattern + " (" + strconv.Itoa(e.Offset) + "): " + e.Message
+}
+
+func api_malloc(size size_t) unsafe.Pointer {
+	return noarch.Malloc(int32(uint32((size_t(size)))))
+}
+
+func api_free(block unsafe.Pointer) {
+	noarch.Free(block)
+}
+
+func init() {
+	pcre_malloc = api_malloc
+	pcre_free = api_free
+	pcre_stack_malloc = api_malloc
+	pcre_stack_free = api_free
 }
