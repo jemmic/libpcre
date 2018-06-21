@@ -13,14 +13,29 @@ type apiTest struct {
 func TestApi(t *testing.T) {
 	tests := map[string]apiTest{
 		`simple1`: {
-			pattern: "/a*abc?xyz+pqr{3}ab{2,}xy{4,5}pq{0,6}AB{0,}zz/",
+			pattern: "a*abc?xyz+pqr{3}ab{2,}xy{4,5}pq{0,6}AB{0,}zz",
 			matchers: []string{"abxyzpqrrrabbxyyyypqAzz"},
 			nomatchers: []string{"abxyzpqrrabbxyyyypqAzz"},
 		},
 		`simple2`: {
-			pattern: "/(?<=(foo)a)bar/",
+			pattern: "(?<=(foo)a)bar",
 			matchers: []string{"fooabar"},
 			nomatchers: []string{"foobbar"},
+		},
+		`empty`: {
+			pattern: "",
+			matchers: []string{"foo"},
+			nomatchers: []string{},
+		},
+		`nonword`: {
+			pattern: "/\\*|[\"';)].*--",
+			matchers: []string{"aaaaaaaaa/*aaaa", "aaaaa\"rr--zzzzz"},
+			nomatchers: []string{"dd/rrr", "\"';)rrrr-ss"},
+		},
+		`defined`: {
+			pattern: "(?(DEFINE)(?<defined>a|bb)(?<ff>fff))(?&defined)",
+			matchers: []string{"weragghgh", "eihfbjbb"},
+			nomatchers: []string{"cbefff"},
 		},
 	}
 	for name, testit := range tests {
