@@ -2,10 +2,8 @@
 
 package libpcre
 
-// #include <sys/resource.h>
 // #include <locale.h>
 // #include <time.h>
-// #include <regex.h>
 import "C"
 import "unsafe"
 import "github.com/elliotchance/c2go/noarch"
