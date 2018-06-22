@@ -1,3 +1,5 @@
+// +build !windows
+
 package libpcre
 
 import (
@@ -92,6 +94,8 @@ func goBuildPcretest(srcDir string, tmpDir string) error {
 		args = append(args, "pcretest_added_linux.go")
 	} else if runtime.GOOS == "darwin" {
 		args = append(args, "pcretest_added_darwin.go")
+	} else if runtime.GOOS == "windows" {
+		args = append(args, "pcretest_added_windows.go")
 	}
 	cmd := exec.Command("go", args...)
 	cmd.Dir = tmpDir
