@@ -359,9 +359,8 @@ func (m *Matcher) ExecString(subject string, flags int) int {
 	if length == 0 {
 		subject = "\000" // make first character addressable
 	}
-	// The following is a non-portable kludge to avoid a copy
-	//subjectptr := *(**char)(unsafe.Pointer(&subject))
-	return m.exec(&append([]byte(subject), 0)[0], length, flags)
+	subjectptr := &([]byte(subject))[0]
+	return m.exec(subjectptr, length, flags)
 }
 
 func (m *Matcher) exec(subjectptr *byte, length, flags int) int {
